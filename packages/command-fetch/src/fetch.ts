@@ -1,5 +1,5 @@
 import { createWriteStream } from 'node:fs';
-import { logger, DataPrepError } from '@ai-upkaran/core';
+import { logger, DataPrepError } from '@cli-upkaran/core';
 import {
   runPipeline,
   type AdapterOptions,
@@ -8,8 +8,8 @@ import {
   type Formatter,
   type ContentItem, // Import Formatter type
   // TODO: Import specific formatters when they exist
-} from '@ai-upkaran/dataprep-core';
-import { createWebsiteAdapter } from '@ai-upkaran/adapter-website'; // Assuming adapter provides this factory
+} from '@cli-upkaran/dataprep-core';
+import { createWebsiteAdapter } from '@cli-upkaran/adapter-website'; // Assuming adapter provides this factory
 import type { FetchOptions } from './options.js';
 
 // Placeholder Formatters

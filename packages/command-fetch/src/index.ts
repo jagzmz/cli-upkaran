@@ -1,5 +1,5 @@
 import type { Command } from 'commander';
-import type { CommandDefinition } from '@ai-upkaran/core';
+import type { CommandDefinition } from '@cli-upkaran/core';
 import { runFetch } from './fetch.js';
 import { configureFetchOptions, type FetchOptions } from './options.js';
 import path from 'node:path';

@@ -1,5 +1,5 @@
 {
-  "name": "@ai-upkaran/command-digest",
+  "name": "@cli-upkaran/command-digest",
   "version": "0.0.1",
   "description": "The 'digest' command implementation for ai-upkaran",
   "main": "dist/index.js",
@@ -22,9 +22,9 @@
   "author": "Your Name <your.email@example.com>",
   "license": "MIT",
   "dependencies": {
-    "@ai-upkaran/core": "workspace:*",
-    "@ai-upkaran/dataprep-core": "workspace:*",
-    "@ai-upkaran/adapter-filesystem": "workspace:*",
+    "@cli-upkaran/core": "workspace:*",
+    "@cli-upkaran/dataprep-core": "workspace:*",
+    "@cli-upkaran/adapter-filesystem": "workspace:*",
     "commander": "^12.0.0"
   },
   "devDependencies": {

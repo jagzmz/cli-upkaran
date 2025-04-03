@@ -29,9 +29,9 @@ export function createConfig(options) {
     'node:module', 'node:fs', 'node:path', 'node:os', 'node:util', 'node:events', 'node:stream', 'node:child_process', 'node:crypto'
   ];
   
-  // Ensure all @ai-upkaran/* packages are external except the current one
+  // Ensure all @cli-upkaran/* packages are external except the current one
   const aiUpkaranExternals = allDependencies
-    .filter(dep => dep.startsWith('@ai-upkaran/') && dep !== pkg.name);
+    .filter(dep => dep.startsWith('@cli-upkaran/') && dep !== pkg.name);
   
   const allExternals = [...new Set([...external, ...allDependencies, ...aiUpkaranExternals])];
   

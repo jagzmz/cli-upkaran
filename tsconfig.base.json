@@ -15,7 +15,7 @@
     "composite": true,
     "baseUrl": ".",
     "paths": {
-        "@ai-upkaran/*": ["packages/*/src"]
+        "@cli-upkaran/*": ["packages/*/src"]
     },
     "isolatedModules": true,
     "verbatimModuleSyntax": true,

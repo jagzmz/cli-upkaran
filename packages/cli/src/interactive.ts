@@ -5,7 +5,7 @@ import {
   logger,
   type GlobalConfig,
   type CommandDefinition,
-} from '@ai-upkaran/core';
+} from '@cli-upkaran/core';
 import ora from 'ora';
 
 // Helper to dynamically build prompts based on command options

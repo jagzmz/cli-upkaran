@@ -56,10 +56,10 @@ importers:
 
   packages/adapter-filesystem:
     dependencies:
-      '@ai-upkaran/core':
+      '@cli-upkaran/core':
         specifier: workspace:*
         version: link:../core
-      '@ai-upkaran/dataprep-core':
+      '@cli-upkaran/dataprep-core':
         specifier: workspace:*
         version: link:../dataprep-core
       glob:
@@ -81,10 +81,10 @@ importers:
 
   packages/adapter-website:
     dependencies:
-      '@ai-upkaran/core':
+      '@cli-upkaran/core':
         specifier: workspace:*
         version: link:../core
-      '@ai-upkaran/dataprep-core':
+      '@cli-upkaran/dataprep-core':
         specifier: workspace:*
         version: link:../dataprep-core
       '@mozilla/readability':
@@ -142,18 +142,18 @@ importers:
 
   packages/cli:
     dependencies:
-      '@ai-upkaran/command-digest':
-        specifier: workspace:*
-        version: link:../command-digest
-      '@ai-upkaran/command-fetch':
-        specifier: workspace:*
-        version: link:../command-fetch
-      '@ai-upkaran/core':
-        specifier: workspace:*
-        version: link:../core
       '@clack/prompts':
         specifier: ^0.7.0
         version: 0.7.0
+      '@cli-upkaran/command-digest':
+        specifier: workspace:*
+        version: link:../command-digest
+      '@cli-upkaran/command-fetch':
+        specifier: workspace:*
+        version: link:../command-fetch
+      '@cli-upkaran/core':
+        specifier: workspace:*
+        version: link:../core
       chalk:
         specifier: ^5.3.0
         version: 5.4.1
@@ -185,13 +185,13 @@ importers:
 
   packages/command-digest:
     dependencies:
-      '@ai-upkaran/adapter-filesystem':
+      '@cli-upkaran/adapter-filesystem':
         specifier: workspace:*
         version: link:../adapter-filesystem
-      '@ai-upkaran/core':
+      '@cli-upkaran/core':
         specifier: workspace:*
         version: link:../core
-      '@ai-upkaran/dataprep-core':
+      '@cli-upkaran/dataprep-core':
         specifier: workspace:*
         version: link:../dataprep-core
       commander:
@@ -204,13 +204,13 @@ importers:
 
   packages/command-fetch:
     dependencies:
-      '@ai-upkaran/adapter-website':
+      '@cli-upkaran/adapter-website':
         specifier: workspace:*
         version: link:../adapter-website
-      '@ai-upkaran/core':
+      '@cli-upkaran/core':
         specifier: workspace:*
         version: link:../core
-      '@ai-upkaran/dataprep-core':
+      '@cli-upkaran/dataprep-core':
         specifier: workspace:*
         version: link:../dataprep-core
       commander:
@@ -236,7 +236,7 @@ importers:
 
   packages/dataprep-core:
     dependencies:
-      '@ai-upkaran/core':
+      '@cli-upkaran/core':
         specifier: workspace:*
         version: link:../core
       ignore:

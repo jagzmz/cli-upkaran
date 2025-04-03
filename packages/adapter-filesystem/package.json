@@ -1,5 +1,5 @@
 {
-  "name": "@ai-upkaran/adapter-filesystem",
+  "name": "@cli-upkaran/adapter-filesystem",
   "version": "0.0.1",
   "description": "Filesystem data preparation adapter for ai-upkaran",
   "main": "dist/index.js",
@@ -22,8 +22,8 @@
   "author": "Your Name <your.email@example.com>",
   "license": "MIT",
   "dependencies": {
-    "@ai-upkaran/core": "workspace:*",
-    "@ai-upkaran/dataprep-core": "workspace:*",
+    "@cli-upkaran/core": "workspace:*",
+    "@cli-upkaran/dataprep-core": "workspace:*",
     "glob": "^10.3.10",
     "ignore": "^5.3.1",
     "isbinaryfile": "^5.0.2"

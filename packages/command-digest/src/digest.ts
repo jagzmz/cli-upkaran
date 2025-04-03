@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { createWriteStream, promises as fs } from 'node:fs';
-import { logger, DataPrepError } from '@ai-upkaran/core';
+import { logger, DataPrepError } from '@cli-upkaran/core';
 import {
   runPipeline,
   createIgnoreFilter,
@@ -10,8 +10,8 @@ import {
   type Transformer,
   // TODO: Import specific formatters when they exist
   // import { createMarkdownFormatter, createJsonFormatter } from '../formatters';
-} from '@ai-upkaran/dataprep-core';
-import { createFileSystemAdapter } from '@ai-upkaran/adapter-filesystem';
+} from '@cli-upkaran/dataprep-core';
+import { createFileSystemAdapter } from '@cli-upkaran/adapter-filesystem';
 import type { DigestOptions } from './options.js';
 import { DEFAULT_IGNORES } from './default-ignores.js'; // Define default ignores for digest
 

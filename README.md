@@ -1,10 +1,10 @@
-# `@ai-upkaran`
+# `@cli-upkaran`
 
 A unified command-line interface (CLI) toolkit and extensible platform for a wide range of AI-related tasks.
 
 ## Overview
 
-`@ai-upkaran` (Upkaran: Hindi/Sanskrit for "tool" or "instrument") provides developers and researchers with a consistent, powerful, and user-friendly environment for:
+`@cli-upkaran` (Upkaran: Hindi/Sanskrit for "tool" or "instrument") provides developers and researchers with a consistent, powerful, and user-friendly environment for:
 
 *   Interacting with AI models
 *   Advanced data preparation (files, websites)

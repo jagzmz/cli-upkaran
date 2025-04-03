@@ -1,4 +1,4 @@
-import { logger } from '@ai-upkaran/core';
+import { logger } from '@cli-upkaran/core';
 import fetch, { Response } from 'node-fetch'; // Use node-fetch v3 for ESM
 
 export interface FetchResult {

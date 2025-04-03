@@ -1629,11 +1629,11 @@ Use the above code only as a reference for generating new code !!!
 
 ###########
 
-Okay, let's undertake this comprehensive task. We will create a highly detailed specification for `@ai-upkaran` as a general AI Toolkit CLI, followed by the corresponding initial code structure and stubs for the monorepo.
+Okay, let's undertake this comprehensive task. We will create a highly detailed specification for `@cli-upkaran` as a general AI Toolkit CLI, followed by the corresponding initial code structure and stubs for the monorepo.
 
 ---
 
-**Project Specification: @ai-upkaran (General AI Toolkit)**
+**Project Specification: @cli-upkaran (General AI Toolkit)**
 
 **Version:** 1.0 (Draft)
 
@@ -1641,9 +1641,9 @@ Okay, let's undertake this comprehensive task. We will create a highly detailed 
 
 **1. Vision & Introduction**
 
-`@ai-upkaran` (Upkaran: Hindi/Sanskrit for "tool" or "instrument") is envisioned as a **unified command-line interface (CLI) toolkit and extensible platform for a wide range of AI-related tasks**. It aims to provide developers and researchers with a consistent, powerful, and user-friendly environment for interacting with AI models, processing data, and managing AI workflows.
+`@cli-upkaran` (Upkaran: Hindi/Sanskrit for "tool" or "instrument") is envisioned as a **unified command-line interface (CLI) toolkit and extensible platform for a wide range of AI-related tasks**. It aims to provide developers and researchers with a consistent, powerful, and user-friendly environment for interacting with AI models, processing data, and managing AI workflows.
 
-Beyond its initial capabilities in advanced data preparation (gathering from filesystems/websites, transforming, formatting for LLMs), `@ai-upkaran` is designed as a **pluggable command system**. This allows it, or the community, to seamlessly integrate diverse functionalities such as text generation, model interaction, sentiment analysis, fine-tuning initiation, vector database operations, and more, all accessible under the single `ai-upkaran` command.
+Beyond its initial capabilities in advanced data preparation (gathering from filesystems/websites, transforming, formatting for LLMs), `@cli-upkaran` is designed as a **pluggable command system**. This allows it, or the community, to seamlessly integrate diverse functionalities such as text generation, model interaction, sentiment analysis, fine-tuning initiation, vector database operations, and more, all accessible under the single `ai-upkaran` command.
 
 Key principles guiding the project are:
 
@@ -1656,19 +1656,19 @@ Key principles guiding the project are:
 
 **2. Core Concepts (General Toolkit)**
 
-*   **CLI Application (`@ai-upkaran/cli`):** The main user-facing package and entry point (`npx ai-upkaran`). Responsible for parsing initial arguments, identifying the target command, loading the appropriate command plugin/module, providing shared UI elements (prompts, spinners, colored output), and managing the interactive mode.
+*   **CLI Application (`@cli-upkaran/cli`):** The main user-facing package and entry point (`npx ai-upkaran`). Responsible for parsing initial arguments, identifying the target command, loading the appropriate command plugin/module, providing shared UI elements (prompts, spinners, colored output), and managing the interactive mode.
 *   **Command:** A distinct unit of functionality addressable via the CLI (e.g., `digest`, `fetch`, `generate`, `analyze`). Each command handles specific arguments and options and performs a defined task.
 *   **Command Plugin:** A module (typically an npm package or local file) that defines and implements one or more commands. These plugins are discovered and loaded by the CLI core.
     *   **Interface:** Must export a specific structure or function (e.g., `registerCommands`) that the CLI can use to understand the command(s) provided (name, description, options definition, handler function).
 *   **Command Handler:** The function within a command plugin that contains the main logic for executing that command. It receives parsed arguments and options from the CLI.
-*   **Core Utilities (`@ai-upkaran/core`):** A package containing truly universal functionalities shared across *all* potential commands and the CLI itself. This includes:
+*   **Core Utilities (`@cli-upkaran/core`):** A package containing truly universal functionalities shared across *all* potential commands and the CLI itself. This includes:
     *   Base configuration loading logic (e.g., from common files or environment variables).
     *   Shared logging setup and utilities (`chalk`).
     *   The command plugin discovery and loading mechanism.
     *   Core type definitions (e.g., `CommandDefinition`, `CommandHandler`, `PluginRegistration`).
     *   Shared error classes.
     *   Highly generic utility functions.
-*   **Subsystem Libraries (e.g., `@ai-upkaran/dataprep-core`):** Dedicated packages containing shared logic and types specific to a *subset* of commands or a particular domain (like data preparation). These are used *by* specific command plugins but are not part of the universal core.
+*   **Subsystem Libraries (e.g., `@cli-upkaran/dataprep-core`):** Dedicated packages containing shared logic and types specific to a *subset* of commands or a particular domain (like data preparation). These are used *by* specific command plugins but are not part of the universal core.
 
 **3. Architecture (Monorepo)**
 
@@ -1680,34 +1680,34 @@ The project will utilize a monorepo structure managed by `pnpm` workspaces.
     *   `tsconfig.base.json`: Shared base TypeScript configuration inherited by packages.
     *   `.gitignore`, `README.md`, etc.
 *   **`packages/`**
-    *   **`core` (`@ai-upkaran/core`)**:
+    *   **`core` (`@cli-upkaran/core`)**:
         *   **Purpose:** Universal utilities, types, plugin loading.
         *   **Key Files:** `config.ts`, `logger.ts`, `plugin-loader.ts`, `types.ts`, `error.ts`, `utils.ts`.
         *   **Dependencies:** `chalk`.
-    *   **`cli` (`@ai-upkaran/cli`)**:
+    *   **`cli` (`@cli-upkaran/cli`)**:
         *   **Purpose:** Main entry point, command routing, argument parsing, interactive mode, shared UI.
         *   **Key Files:** `index.ts` (main entry), `commands.ts` (command registration/routing), `interactive.ts`, `ui/` (prompt wrappers, spinners), `utils/` (CLI-specific utils).
-        *   **Dependencies:** `@ai-upkaran/core`, `commander` (or `cac`), `@clack/prompts`, `ora`.
-    *   **`dataprep-core` (`@ai-upkaran/dataprep-core`)**:
+        *   **Dependencies:** `@cli-upkaran/core`, `commander` (or `cac`), `@clack/prompts`, `ora`.
+    *   **`dataprep-core` (`@cli-upkaran/dataprep-core`)**:
         *   **Purpose:** Shared logic and types *specifically* for data preparation commands (`digest`, `fetch`).
         *   **Key Files:** `content-item.ts`, `adapters.ts` (Adapter interface), `transformers.ts` (Transformer interface), `formatters.ts` (Formatter interface), `pipeline.ts` (Streaming pipeline logic), `ignore.ts` (Ignore/match utils), `token-estimator.ts`.
-        *   **Dependencies:** `@ai-upkaran/core`, `js-tiktoken`, `ignore`, `micromatch`.
-    *   **`command-digest` (`@ai-upkaran/command-digest`)**:
+        *   **Dependencies:** `@cli-upkaran/core`, `js-tiktoken`, `ignore`, `micromatch`.
+    *   **`command-digest` (`@cli-upkaran/command-digest`)**:
         *   **Purpose:** Implements the `digest` command plugin.
         *   **Key Files:** `index.ts` (registers command with CLI), `digest.ts` (main handler logic), `options.ts` (command-specific options definition).
-        *   **Dependencies:** `@ai-upkaran/core`, `@ai-upkaran/dataprep-core`, `@ai-upkaran/adapter-filesystem`.
-    *   **`command-fetch` (`@ai-upkaran/command-fetch`)**:
+        *   **Dependencies:** `@cli-upkaran/core`, `@cli-upkaran/dataprep-core`, `@cli-upkaran/adapter-filesystem`.
+    *   **`command-fetch` (`@cli-upkaran/command-fetch`)**:
         *   **Purpose:** Implements the `fetch` command plugin.
         *   **Key Files:** `index.ts` (registers command with CLI), `fetch.ts` (main handler logic), `options.ts`.
-        *   **Dependencies:** `@ai-upkaran/core`, `@ai-upkaran/dataprep-core`, `@ai-upkaran/adapter-website`.
-    *   **`adapter-filesystem` (`@ai-upkaran/adapter-filesystem`)**:
+        *   **Dependencies:** `@cli-upkaran/core`, `@cli-upkaran/dataprep-core`, `@cli-upkaran/adapter-website`.
+    *   **`adapter-filesystem` (`@cli-upkaran/adapter-filesystem`)**:
         *   **Purpose:** Data preparation adapter for local files. Implements `Adapter` interface from `dataprep-core`.
         *   **Key Files:** `index.ts` (adapter implementation), `utils.ts`.
-        *   **Dependencies:** `@ai-upkaran/core`, `@ai-upkaran/dataprep-core`, `glob`, `isbinaryfile`.
-    *   **`adapter-website` (`@ai-upkaran/adapter-website`)**:
+        *   **Dependencies:** `@cli-upkaran/core`, `@cli-upkaran/dataprep-core`, `glob`, `isbinaryfile`.
+    *   **`adapter-website` (`@cli-upkaran/adapter-website`)**:
         *   **Purpose:** Data preparation adapter for websites. Implements `Adapter` interface from `dataprep-core`.
         *   **Key Files:** `index.ts` (adapter implementation, includes Readability logic), `sitemap.ts`, `readability.ts`, `utils.ts`.
-        *   **Dependencies:** `@ai-upkaran/core`, `@ai-upkaran/dataprep-core`, `node-fetch` (or native), `p-queue`, `fast-xml-parser`, `@mozilla/readability`, `turndown`, `turndown-plugin-gfm`, `cheerio`.
+        *   **Dependencies:** `@cli-upkaran/core`, `@cli-upkaran/dataprep-core`, `node-fetch` (or native), `p-queue`, `fast-xml-parser`, `@mozilla/readability`, `turndown`, `turndown-plugin-gfm`, `cheerio`.
     *   **`(Future) command-*`:** Other command plugins following the same pattern.
     *   **`(Future) transformer-*`:** Plugins providing data preparation transformers.
     *   **`(Future) formatter-*`:** Plugins providing data preparation formatters.
@@ -1722,7 +1722,7 @@ The project will utilize a monorepo structure managed by `pnpm` workspaces.
 
 These options are processed by the main `cli` package before routing to a command.
 
-*   `-V, --version`: Display the version number of `@ai-upkaran/cli`.
+*   `-V, --version`: Display the version number of `@cli-upkaran/cli`.
 *   `-h, --help`: Display global help or help for a specific `<command>` if provided.
 *   `--verbose`: Enable more detailed logging output across all modules.
 *   `--no-color`: Disable colored output.
@@ -1740,20 +1740,20 @@ Each command plugin defines:
 
 **4.3. Initial Built-in Commands**
 
-*   **`digest`:** (Defined in `@ai-upkaran/command-digest`)
+*   **`digest`:** (Defined in `@cli-upkaran/command-digest`)
     *   **Description:** Aggregates and processes local files into a single output, suitable for AI context.
     *   **Usage:** `npx ai-upkaran digest [<input_directory>] [options]`
     *   **Arguments & Options:** *See detailed specification in previous response (Section 4.1, digest command). All options related to input dir, output, format (markdown/json), match, ignore, gitignore, defaults, whitespace, transforms, plugins (for dataprep), showing files.*
-    *   **Handler:** Uses `@ai-upkaran/dataprep-core` pipeline logic, configured with `@ai-upkaran/adapter-filesystem`.
-*   **`fetch`:** (Defined in `@ai-upkaran/command-fetch`)
+    *   **Handler:** Uses `@cli-upkaran/dataprep-core` pipeline logic, configured with `@cli-upkaran/adapter-filesystem`.
+*   **`fetch`:** (Defined in `@cli-upkaran/command-fetch`)
     *   **Description:** Fetches and processes content from websites (via crawling or sitemap) into a single output.
     *   **Usage:** `npx ai-upkaran fetch <url_or_sitemap_path> [options]`
     *   **Arguments & Options:** *See detailed specification in previous response (Section 4.1, fetch command). All options related to URL, output, format (markdown/json/text), adapter (dataprep), sitemap, match, selector, concurrency, limit, crawling, auth, transforms, plugins (for dataprep), showing URLs.*
-    *   **Handler:** Uses `@ai-upkaran/dataprep-core` pipeline logic, configured with `@ai-upkaran/adapter-website` (or other loaded website adapters).
+    *   **Handler:** Uses `@cli-upkaran/dataprep-core` pipeline logic, configured with `@cli-upkaran/adapter-website` (or other loaded website adapters).
 
 **4.4. Interactive Mode (`npx ai-upkaran`)**
 
-Managed by `@ai-upkaran/cli`.
+Managed by `@cli-upkaran/cli`.
 
 1.  **Display Welcome:** Show a vibrant welcome message.
 2.  **Command Selection:** Prompt user to choose from a list of *all available* commands (discovered from built-in definitions and loaded command plugins). Use `@clack/prompts` `select`.
@@ -1765,7 +1765,7 @@ Managed by `@ai-upkaran/cli`.
 
 **5. Plugin System (Commands)**
 
-Managed by `@ai-upkaran/core` and utilized by `@ai-upkaran/cli`.
+Managed by `@cli-upkaran/core` and utilized by `@cli-upkaran/cli`.
 
 *   **Plugin Definition (`core/src/types.ts`):**
     ```typescript
@@ -1793,7 +1793,7 @@ Managed by `@ai-upkaran/core` and utilized by `@ai-upkaran/cli`.
     ```
 *   **Discovery (`core/src/plugin-loader.ts`):**
     *   Looks for plugins specified via CLI flag (`--plugin <name_or_path>`) or eventually a config file.
-    *   Potentially searches for packages matching a naming convention (e.g., `@ai-upkaran/command-*`) in `node_modules`.
+    *   Potentially searches for packages matching a naming convention (e.g., `@cli-upkaran/command-*`) in `node_modules`.
 *   **Loading (`core/src/plugin-loader.ts`):**
     *   Uses dynamic `import()` to load the plugin module's entry point.
     *   Checks for an exported `registerCommands` (or similar conventional name) function.
@@ -1806,7 +1806,7 @@ Managed by `@ai-upkaran/core` and utilized by `@ai-upkaran/cli`.
         *   Call the command's `configure` function to add its specific options/arguments.
         *   Set the command's action/handler to call the `handler` function.
 
-**6. Data Preparation Subsystem (`@ai-upkaran/dataprep-core`, Adapters, Transformers, Formatters)**
+**6. Data Preparation Subsystem (`@cli-upkaran/dataprep-core`, Adapters, Transformers, Formatters)**
 
 This subsystem is *used by* commands like `digest` and `fetch` but is separate from the core CLI/plugin mechanism.
 
@@ -1907,7 +1907,7 @@ cd ../..
 mkdir packages/cli
 cd packages/cli
 pnpm init --yes
-# Add dependencies: @ai-upkaran/core, commander, @clack/prompts, ora, chalk
+# Add dependencies: @cli-upkaran/core, commander, @clack/prompts, ora, chalk
 # Add devDependencies: @types/node, @types/ora
 # Add bin entry to package.json: "bin": { "ai-upkaran": "./dist/index.js" }
 echo '{ "extends": "../../tsconfig.base.json", "compilerOptions": { "outDir": "./dist", "rootDir": "./src" }, "include": ["src/**/*"], "references": [{"path": "../core"}] }' > tsconfig.json
@@ -1919,7 +1919,7 @@ touch src/index.ts src/commands.ts src/interactive.ts src/ui/prompts.ts src/ui/s
 import { Command } from 'commander';
 import { registerCommands } from './commands';
 // import { runInteractive } from './interactive';
-import { logger } from '@ai-upkaran/core'; // Assuming core exports logger
+import { logger } from '@cli-upkaran/core'; // Assuming core exports logger
 
 async function main() {
   const program = new Command();
@@ -1948,10 +1948,10 @@ main().catch(err => {
 
 # src/commands.ts
 import { Command } from 'commander';
-import { loadCommandPlugins, CommandPlugin, CommandDefinition } from '@ai-upkaran/core';
+import { loadCommandPlugins, CommandPlugin, CommandDefinition } from '@cli-upkaran/core';
 // Import built-in command registration functions
-import { registerDigestCommand } from '@ai-upkaran/command-digest';
-import { registerFetchCommand } from '@ai-upkaran/command-fetch';
+import { registerDigestCommand } from '@cli-upkaran/command-digest';
+import { registerFetchCommand } from '@cli-upkaran/command-fetch';
 
 function addCommand(program: Command, def: CommandDefinition) {
     const cmd = program.command(def.name);
@@ -1989,7 +1989,7 @@ cd ../..
 mkdir packages/dataprep-core
 cd packages/dataprep-core
 pnpm init --yes
-# Add dependencies: @ai-upkaran/core, js-tiktoken, ignore, micromatch
+# Add dependencies: @cli-upkaran/core, js-tiktoken, ignore, micromatch
 # Add devDependencies: @types/node
 echo '{ "extends": "../../tsconfig.base.json", "compilerOptions": { "outDir": "./dist", "rootDir": "./src" }, "include": ["src/**/*"], "references": [{"path": "../core"}] }' > tsconfig.json
 mkdir src
@@ -2009,7 +2009,7 @@ cd ../..
 mkdir packages/command-digest
 cd packages/command-digest
 pnpm init --yes
-# Add dependencies: @ai-upkaran/core, @ai-upkaran/dataprep-core, @ai-upkaran/adapter-filesystem, commander
+# Add dependencies: @cli-upkaran/core, @cli-upkaran/dataprep-core, @cli-upkaran/adapter-filesystem, commander
 # Add devDependencies: @types/node
 echo '{ "extends": "../../tsconfig.base.json", "compilerOptions": { "outDir": "./dist", "rootDir": "./src" }, "include": ["src/**/*"], "references": [{"path": "../core"}, {"path": "../dataprep-core"}, {"path": "../adapter-filesystem"}] }' > tsconfig.json
 mkdir src
@@ -2017,7 +2017,7 @@ touch src/index.ts src/digest.ts src/options.ts
 # --- Add initial command registration structure ---
 # src/index.ts
 import type { Command } from 'commander';
-import type { CommandDefinition } from '@ai-upkaran/core';
+import type { CommandDefinition } from '@cli-upkaran/core';
 import { runDigest } from './digest';
 import { configureDigestOptions } from './options';
 
@@ -2055,9 +2055,9 @@ export function configureDigestOptions(command: Command) {
 }
 
 # src/digest.ts
-import { logger } from '@ai-upkaran/core';
-// import { runPipeline } from '@ai-upkaran/dataprep-core';
-// import { createFileSystemAdapter } from '@ai-upkaran/adapter-filesystem';
+import { logger } from '@cli-upkaran/core';
+// import { runPipeline } from '@cli-upkaran/dataprep-core';
+// import { createFileSystemAdapter } from '@cli-upkaran/adapter-filesystem';
 // import { createMarkdownFormatter, createJsonFormatter } from './formatters'; // Needs formatters
 
 export async function runDigest(inputDir: string, options: any) {
@@ -2084,15 +2084,15 @@ cd ../..
 mkdir packages/adapter-filesystem
 cd packages/adapter-filesystem
 pnpm init --yes
-# Add dependencies: @ai-upkaran/core, @ai-upkaran/dataprep-core, glob, isbinaryfile
+# Add dependencies: @cli-upkaran/core, @cli-upkaran/dataprep-core, glob, isbinaryfile
 # Add devDependencies: @types/node, @types/glob, @types/isbinaryfile
 echo '{ "extends": "../../tsconfig.base.json", "compilerOptions": { "outDir": "./dist", "rootDir": "./src" }, "include": ["src/**/*"], "references": [{"path": "../core"}, {"path": "../dataprep-core"}] }' > tsconfig.json
 mkdir src
 touch src/index.ts src/utils.ts
 # --- Add initial adapter structure ---
 # src/index.ts
-import { Adapter, AdapterOptions, ContentItem } from '@ai-upkaran/dataprep-core';
-import { logger } from '@ai-upkaran/core';
+import { Adapter, AdapterOptions, ContentItem } from '@cli-upkaran/dataprep-core';
+import { logger } from '@cli-upkaran/core';
 
 class FileSystemAdapter implements Adapter {
     async *getStream(source: string, options: AdapterOptions): AsyncIterable<ContentItem> {
@@ -2130,4 +2130,4 @@ cd ../..
 
 ```
 
-This detailed specification and code structure provide a comprehensive starting point for building `@ai-upkaran` as a versatile AI toolkit CLI, addressing the expanded vision while retaining the detailed data preparation capabilities. Remember to fill in the `// TODO:` sections and add robust error handling and tests.
+This detailed specification and code structure provide a comprehensive starting point for building `@cli-upkaran` as a versatile AI toolkit CLI, addressing the expanded vision while retaining the detailed data preparation capabilities. Remember to fill in the `// TODO:` sections and add robust error handling and tests.

@@ -2,14 +2,14 @@ import path from 'node:path';
 import { promises as fs } from 'node:fs';
 import { glob } from 'glob';
 import { isBinaryFile } from 'isbinaryfile';
-import { logger } from '@ai-upkaran/core';
+import { logger } from '@cli-upkaran/core';
 import {
   type Adapter,
   type AdapterOptions,
   type ContentItem,
   createIgnoreFilter,
   readIgnoreFile,
-} from '@ai-upkaran/dataprep-core';
+} from '@cli-upkaran/dataprep-core';
 import { getFileMetadata } from './utils.js';
 
 const ADAPTER_NAME = 'filesystem';

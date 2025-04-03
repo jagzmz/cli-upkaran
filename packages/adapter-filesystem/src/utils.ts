@@ -1,6 +1,6 @@
 import { promises as fs, Stats } from 'node:fs';
 import path from 'node:path';
-import { logger } from '@ai-upkaran/core';
+import { logger } from '@cli-upkaran/core';
 
 /**
  * Gets basic file metadata.

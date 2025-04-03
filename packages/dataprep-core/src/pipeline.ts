@@ -1,5 +1,5 @@
 import type { Writable } from 'node:stream';
-import { logger, DataPrepError } from '@ai-upkaran/core';
+import { logger, DataPrepError } from '@cli-upkaran/core';
 import type { Adapter, AdapterOptions } from './adapters.js';
 import type { ContentItem } from './content-item.js';
 import type { Transformer, TransformContext } from './transformers.js';

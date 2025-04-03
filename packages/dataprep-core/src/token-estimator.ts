@@ -3,7 +3,7 @@ import {
   type Tiktoken,
   type TiktokenModel,
 } from 'js-tiktoken';
-import { logger } from '@ai-upkaran/core';
+import { logger } from '@cli-upkaran/core';
 
 let tokenizer: Tiktoken | null = null;
 const DEFAULT_MODEL: TiktokenModel = 'gpt-4o'; // Use a recent model for estimation

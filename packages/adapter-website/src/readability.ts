@@ -4,7 +4,7 @@ import TurndownService from 'turndown';
 // @ts-ignore
 import { gfm } from 'turndown-plugin-gfm';
 import * as cheerio from 'cheerio';
-import { logger } from '@ai-upkaran/core';
+import { logger } from '@cli-upkaran/core';
 
 export interface ProcessedPage {
   title: string;

@@ -1,4 +1,4 @@
-import { logger } from '@ai-upkaran/core';
+import { logger } from '@cli-upkaran/core';
 import * as cheerio from 'cheerio';
 import { fetchUrl } from './fetch-utils.js';
 import { XMLParser } from 'fast-xml-parser';

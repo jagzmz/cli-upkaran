@@ -1,11 +1,11 @@
 import PQueue from 'p-queue';
-import { logger } from '@ai-upkaran/core';
+import { logger } from '@cli-upkaran/core';
 import {
   type Adapter,
   type AdapterOptions,
   type ContentItem,
   matchPath,
-} from '@ai-upkaran/dataprep-core';
+} from '@cli-upkaran/dataprep-core';
 import { fetchUrl, type FetchResult } from './fetch-utils.js';
 import { extractReadableContent, type ProcessedPage } from './readability.js';
 import { discoverUrls } from './discovery.js';

@@ -1,5 +1,5 @@
 {
-  "name": "@ai-upkaran/dataprep-core",
+  "name": "@cli-upkaran/dataprep-core",
   "version": "0.0.1",
   "description": "Core data preparation logic, types, and interfaces for ai-upkaran",
   "main": "dist/index.js",
@@ -21,7 +21,7 @@
   "author": "Your Name <your.email@example.com>",
   "license": "MIT",
   "dependencies": {
-    "@ai-upkaran/core": "workspace:*",
+    "@cli-upkaran/core": "workspace:*",
     "ignore": "^5.3.1",
     "js-tiktoken": "^1.0.12",
     "micromatch": "^4.0.5"

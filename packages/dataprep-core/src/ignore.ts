@@ -1,7 +1,7 @@
 import micromatch from 'micromatch';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
-import { logger } from '@ai-upkaran/core';
+import { logger } from '@cli-upkaran/core';
 import ignore from 'ignore';
 import type { Ignore } from 'ignore';
 

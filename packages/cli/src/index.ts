@@ -10,7 +10,7 @@ import {
   AiUpkaranError,
   type GlobalConfig,
   type CommandDefinition,
-} from '@ai-upkaran/core';
+} from '@cli-upkaran/core';
 import { createRequire } from 'node:module';
 
 // Helper to read package.json

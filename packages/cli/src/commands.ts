@@ -5,12 +5,12 @@ import {
   type CommandPlugin,
   type CommandDefinition,
   type GlobalConfig,
-} from '@ai-upkaran/core';
+} from '@cli-upkaran/core';
 
 // --- Import built-in command registration functions --- S
 // These imports will likely cause dependency cycles if commands depend on CLI UI.
 // Consider a different registration pattern if needed, e.g., commands register themselves.
-import { registerDigestCommand } from '@ai-upkaran/command-digest';
+import { registerDigestCommand } from '@cli-upkaran/command-digest';
 
 /**
  * Helper function to add a CommandDefinition to the main Commander program.

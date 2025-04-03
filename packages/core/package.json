@@ -1,5 +1,5 @@
 {
-  "name": "@ai-upkaran/core",
+  "name": "@cli-upkaran/core",
   "version": "0.0.1",
   "description": "Core utilities, types, and plugin system for ai-upkaran",
   "type": "module",

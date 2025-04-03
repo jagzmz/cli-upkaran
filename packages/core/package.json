@@ -1,7 +1,7 @@
 {
   "name": "@cli-upkaran/core",
   "version": "0.0.1",
-  "description": "Core utilities, types, and plugin system for ai-upkaran",
+  "description": "Core utilities, types, and plugin system for cli-upkaran",
   "type": "module",
   "main": "dist/cjs/index.cjs",
   "module": "dist/esm/index.js",
@@ -22,7 +22,7 @@
     "test": "echo \"No tests in core yet\""
   },
   "keywords": [
-    "ai-upkaran",
+    "cli-upkaran",
     "core"
   ],
   "author": "Your Name <your.email@example.com>",

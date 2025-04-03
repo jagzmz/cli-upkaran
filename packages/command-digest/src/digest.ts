@@ -44,7 +44,7 @@ export async function runDigest(
     }
     const customIgnorePath = path.resolve(
       inputDir,
-      options.ignoreFile || '.ai-upkaran-ignore',
+      options.ignoreFile || '.cli-upkaran-ignore',
     );
     ignoreSources.customFile = await readIgnoreFile(customIgnorePath);
 

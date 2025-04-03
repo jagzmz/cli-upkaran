@@ -130,7 +130,7 @@ export const DEFAULT_IGNORES: string[] = [
   'report*.xml',
   'test-results',
 
-  // ai-upkaran output files (prevent self-inclusion)
+  // cli-upkaran output files (prevent self-inclusion)
   'codebase.md',
-  '*.ai-upkaran.json', // Potential future output format
+  '*.cli-upkaran.json', // Potential future output format
 ];

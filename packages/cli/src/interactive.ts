@@ -113,7 +113,7 @@ export async function runInteractive(
   config: GlobalConfig,
   availableCommands: CommandDefinition[]
 ) {
-  p.intro(chalk.inverse(` ${chalk.bold('ai-upkaran Interactive Mode')} `));
+  p.intro(chalk.inverse(` ${chalk.bold('cli-upkaran Interactive Mode')} `));
 
   if (availableCommands.length === 0) {
     p.log.warning('No commands available to run interactively.');

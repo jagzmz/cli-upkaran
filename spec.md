@@ -1643,11 +1643,11 @@ Okay, let's undertake this comprehensive task. We will create a highly detailed 
 
 `@cli-upkaran` (Upkaran: Hindi/Sanskrit for "tool" or "instrument") is envisioned as a **unified command-line interface (CLI) toolkit and extensible platform for a wide range of AI-related tasks**. It aims to provide developers and researchers with a consistent, powerful, and user-friendly environment for interacting with AI models, processing data, and managing AI workflows.
 
-Beyond its initial capabilities in advanced data preparation (gathering from filesystems/websites, transforming, formatting for LLMs), `@cli-upkaran` is designed as a **pluggable command system**. This allows it, or the community, to seamlessly integrate diverse functionalities such as text generation, model interaction, sentiment analysis, fine-tuning initiation, vector database operations, and more, all accessible under the single `ai-upkaran` command.
+Beyond its initial capabilities in advanced data preparation (gathering from filesystems/websites, transforming, formatting for LLMs), `@cli-upkaran` is designed as a **pluggable command system**. This allows it, or the community, to seamlessly integrate diverse functionalities such as text generation, model interaction, sentiment analysis, fine-tuning initiation, vector database operations, and more, all accessible under the single `cli-upkaran` command.
 
 Key principles guiding the project are:
 
-*   **Unified Interface:** A single entry point (`ai-upkaran`) for all integrated tools.
+*   **Unified Interface:** A single entry point (`cli-upkaran`) for all integrated tools.
 *   **Extensibility:** A robust plugin system focused on adding new *commands*.
 *   **Modularity:** Clear separation of concerns between the core CLI, command implementations, and shared libraries (like data preparation utilities).
 *   **User Experience:** Both direct command execution for power users/scripting and an intuitive, interactive mode with vibrant visual feedback for ease of use and discovery.
@@ -1656,7 +1656,7 @@ Key principles guiding the project are:
 
 **2. Core Concepts (General Toolkit)**
 
-*   **CLI Application (`@cli-upkaran/cli`):** The main user-facing package and entry point (`npx ai-upkaran`). Responsible for parsing initial arguments, identifying the target command, loading the appropriate command plugin/module, providing shared UI elements (prompts, spinners, colored output), and managing the interactive mode.
+*   **CLI Application (`@cli-upkaran/cli`):** The main user-facing package and entry point (`npx cli-upkaran`). Responsible for parsing initial arguments, identifying the target command, loading the appropriate command plugin/module, providing shared UI elements (prompts, spinners, colored output), and managing the interactive mode.
 *   **Command:** A distinct unit of functionality addressable via the CLI (e.g., `digest`, `fetch`, `generate`, `analyze`). Each command handles specific arguments and options and performs a defined task.
 *   **Command Plugin:** A module (typically an npm package or local file) that defines and implements one or more commands. These plugins are discovered and loaded by the CLI core.
     *   **Interface:** Must export a specific structure or function (e.g., `registerCommands`) that the CLI can use to understand the command(s) provided (name, description, options definition, handler function).
@@ -1674,7 +1674,7 @@ Key principles guiding the project are:
 
 The project will utilize a monorepo structure managed by `pnpm` workspaces.
 
-*   **`ai-upkaran/` (Root)**
+*   **`cli-upkaran/` (Root)**
     *   `pnpm-workspace.yaml`: Defines the workspace packages.
     *   `package.json`: Root dependencies (mostly devDependencies like TypeScript, Jest, Prettier, ESLint), workspace-wide scripts.
     *   `tsconfig.base.json`: Shared base TypeScript configuration inherited by packages.
@@ -1713,10 +1713,10 @@ The project will utilize a monorepo structure managed by `pnpm` workspaces.
     *   **`(Future) formatter-*`:** Plugins providing data preparation formatters.
     *   **`(Future) adapter-*`:** Plugins providing data preparation adapters.
 
-**4. CLI Interface (`npx ai-upkaran ...`)**
+**4. CLI Interface (`npx cli-upkaran ...`)**
 
-*   **Invocation:** `npx ai-upkaran [global_options] <command> [command_options_and_args]`
-*   **Interactive Mode:** `npx ai-upkaran` (no command specified)
+*   **Invocation:** `npx cli-upkaran [global_options] <command> [command_options_and_args]`
+*   **Interactive Mode:** `npx cli-upkaran` (no command specified)
 
 **4.1. Global Options**
 
@@ -1742,16 +1742,16 @@ Each command plugin defines:
 
 *   **`digest`:** (Defined in `@cli-upkaran/command-digest`)
     *   **Description:** Aggregates and processes local files into a single output, suitable for AI context.
-    *   **Usage:** `npx ai-upkaran digest [<input_directory>] [options]`
+    *   **Usage:** `npx cli-upkaran digest [<input_directory>] [options]`
     *   **Arguments & Options:** *See detailed specification in previous response (Section 4.1, digest command). All options related to input dir, output, format (markdown/json), match, ignore, gitignore, defaults, whitespace, transforms, plugins (for dataprep), showing files.*
     *   **Handler:** Uses `@cli-upkaran/dataprep-core` pipeline logic, configured with `@cli-upkaran/adapter-filesystem`.
 *   **`fetch`:** (Defined in `@cli-upkaran/command-fetch`)
     *   **Description:** Fetches and processes content from websites (via crawling or sitemap) into a single output.
-    *   **Usage:** `npx ai-upkaran fetch <url_or_sitemap_path> [options]`
+    *   **Usage:** `npx cli-upkaran fetch <url_or_sitemap_path> [options]`
     *   **Arguments & Options:** *See detailed specification in previous response (Section 4.1, fetch command). All options related to URL, output, format (markdown/json/text), adapter (dataprep), sitemap, match, selector, concurrency, limit, crawling, auth, transforms, plugins (for dataprep), showing URLs.*
     *   **Handler:** Uses `@cli-upkaran/dataprep-core` pipeline logic, configured with `@cli-upkaran/adapter-website` (or other loaded website adapters).
 
-**4.4. Interactive Mode (`npx ai-upkaran`)**
+**4.4. Interactive Mode (`npx cli-upkaran`)**
 
 Managed by `@cli-upkaran/cli`.
 
@@ -1849,8 +1849,8 @@ This subsystem is *used by* commands like `digest` and `fetch` but is separate f
 
 ```bash
 # 1. Setup Monorepo Root
-mkdir ai-upkaran
-cd ai-upkaran
+mkdir cli-upkaran
+cd cli-upkaran
 pnpm init
 echo "packages:
   - 'packages/*'
@@ -1909,7 +1909,7 @@ cd packages/cli
 pnpm init --yes
 # Add dependencies: @cli-upkaran/core, commander, @clack/prompts, ora, chalk
 # Add devDependencies: @types/node, @types/ora
-# Add bin entry to package.json: "bin": { "ai-upkaran": "./dist/index.js" }
+# Add bin entry to package.json: "bin": { "cli-upkaran": "./dist/index.js" }
 echo '{ "extends": "../../tsconfig.base.json", "compilerOptions": { "outDir": "./dist", "rootDir": "./src" }, "include": ["src/**/*"], "references": [{"path": "../core"}] }' > tsconfig.json
 mkdir src src/ui src/utils
 touch src/index.ts src/commands.ts src/interactive.ts src/ui/prompts.ts src/ui/spinners.ts
@@ -1924,7 +1924,7 @@ import { logger } from '@cli-upkaran/core'; // Assuming core exports logger
 async function main() {
   const program = new Command();
   program
-    .name("ai-upkaran")
+    .name("cli-upkaran")
     .version("0.0.1") // Read from package.json
     .description("A Unified Toolkit for AI Tasks");
 

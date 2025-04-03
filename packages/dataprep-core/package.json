@@ -1,7 +1,7 @@
 {
   "name": "@cli-upkaran/dataprep-core",
   "version": "0.0.1",
-  "description": "Core data preparation logic, types, and interfaces for ai-upkaran",
+  "description": "Core data preparation logic, types, and interfaces for cli-upkaran",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
@@ -14,7 +14,7 @@
     "test": "echo \"No tests in dataprep-core yet\""
   },
   "keywords": [
-    "ai-upkaran",
+    "cli-upkaran",
     "data-preparation",
     "core"
   ],

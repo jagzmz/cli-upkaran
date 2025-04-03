@@ -12,7 +12,7 @@ export interface FetchResult {
 const MAX_REDIRECTS = 5;
 const FETCH_TIMEOUT = 15000; // 15 seconds
 const USER_AGENT =
-  'ai-upkaran-fetcher/0.1 (https://github.com/your-repo/ai-upkaran)'; // Set a descriptive user agent
+  'cli-upkaran-fetcher/0.1 (https://github.com/your-repo/cli-upkaran)'; // Set a descriptive user agent
 
 /**
  * Fetches a URL with timeout, redirect handling, and basic error management.

@@ -1,7 +1,7 @@
 {
   "name": "@cli-upkaran/command-fetch",
   "version": "0.0.1",
-  "description": "The 'fetch' command implementation for ai-upkaran",
+  "description": "The 'fetch' command implementation for cli-upkaran",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
@@ -14,7 +14,7 @@
     "test": "echo \"No tests in command-fetch yet\""
   },
   "keywords": [
-    "ai-upkaran",
+    "cli-upkaran",
     "command",
     "fetch",
     "website",

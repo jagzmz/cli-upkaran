@@ -40,7 +40,7 @@ export function configureDigestOptions(command: Command) {
     .option(
       '--ignore-file <file>',
       'Custom ignore file path',
-      '.ai-upkaran-ignore',
+      '.cli-upkaran-ignore',
     ) // Example custom name
     .addOption(
       new Option('--use-gitignore', 'Apply rules from .gitignore file').default(

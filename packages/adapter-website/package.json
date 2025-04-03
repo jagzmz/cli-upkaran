@@ -1,7 +1,7 @@
 {
   "name": "@cli-upkaran/adapter-website",
   "version": "0.0.1",
-  "description": "Website data preparation adapter for ai-upkaran",
+  "description": "Website data preparation adapter for cli-upkaran",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
@@ -14,7 +14,7 @@
     "test": "echo \"No tests in adapter-website yet\""
   },
   "keywords": [
-    "ai-upkaran",
+    "cli-upkaran",
     "adapter",
     "website",
     "fetch",

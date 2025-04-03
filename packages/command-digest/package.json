@@ -1,7 +1,7 @@
 {
   "name": "@cli-upkaran/command-digest",
   "version": "0.0.1",
-  "description": "The 'digest' command implementation for ai-upkaran",
+  "description": "The 'digest' command implementation for cli-upkaran",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
@@ -14,7 +14,7 @@
     "test": "echo \"No tests in command-digest yet\""
   },
   "keywords": [
-    "ai-upkaran",
+    "cli-upkaran",
     "command",
     "digest",
     "filesystem"

@@ -2,6 +2,7 @@
 
 import { Command, Option } from 'commander';
 import { registerAllCommands } from './commands.js';
+import { registerPluginCommands } from './commands-plugins.js';
 import { runInteractive } from './interactive.js';
 import {
   logger,
@@ -21,7 +22,7 @@ async function main() {
   const program = new Command();
 
   program
-    .name('ai-upkaran')
+    .name('cli-upkaran')
     .version(packageJson.version)
     .description(packageJson.description)
     // Global options
@@ -51,11 +52,14 @@ async function main() {
   setVerbose(config.verbose ?? false);
   // Chalk instance in core logger should handle NO_COLOR / --no-color via config/env
 
-  logger.verbose('ai-upkaran CLI starting...');
+  logger.verbose('cli-upkaran CLI starting...');
   logger.verbose(`Version: ${packageJson.version}`);
   logger.verbose('Global config loaded:', config);
   logger.verbose('Raw CLI arguments:', process.argv);
   logger.verbose('Parsed global options:', globalOpts);
+
+  // Register plugin management commands
+  registerPluginCommands(program);
 
   // Register built-in and plugin commands, passing the loaded config
   const allCommandDefinitions: CommandDefinition[] = await registerAllCommands(
@@ -92,7 +96,7 @@ async function main() {
     await program.parseAsync(process.argv);
   }
 
-  logger.verbose('ai-upkaran CLI finished.');
+  logger.verbose('cli-upkaran CLI finished.');
 }
 
 main().catch((err) => {

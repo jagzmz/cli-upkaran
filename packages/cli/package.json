@@ -1,9 +1,9 @@
 {
   "name": "@cli-upkaran/cli",
   "version": "0.0.1",
-  "description": "Main CLI entry point for the ai-upkaran toolkit",
+  "description": "Main CLI entry point for the cli-upkaran toolkit",
   "bin": {
-    "ai-upkaran": "./dist/index.js"
+    "cli-upkaran": "./dist/index.js"
   },
   "type": "module",
   "scripts": {
@@ -17,7 +17,7 @@
     "test": "echo \"No tests in cli yet\""
   },
   "keywords": [
-    "ai-upkaran",
+    "cli-upkaran",
     "cli"
   ],
   "author": "Your Name <your.email@example.com>",

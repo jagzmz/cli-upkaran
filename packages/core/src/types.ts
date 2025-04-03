@@ -3,7 +3,7 @@
 import type { Command } from 'commander';
 
 /**
- * Global configuration for ai-upkaran CLI
+ * Global configuration for cli-upkaran CLI
  */
 export interface GlobalConfig {
   verbose: boolean;

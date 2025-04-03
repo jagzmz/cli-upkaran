@@ -19,22 +19,35 @@ const __dirname = path.dirname(__filename);
 export function createConfig(options) {
   const { packageDir, input = 'src/index.ts', external = [] } = options;
   const packagePath = path.resolve(__dirname, packageDir);
-  const pkg = JSON.parse(fs.readFileSync(path.join(packagePath, 'package.json'), 'utf-8'));
-  
+  const pkg = JSON.parse(
+    fs.readFileSync(path.join(packagePath, 'package.json'), 'utf-8'),
+  );
+
   // Automatically add all dependencies and peerDependencies as external
   const allDependencies = [
     ...Object.keys(pkg.dependencies || {}),
     ...Object.keys(pkg.peerDependencies || {}),
     // Node.js built-ins should be external
-    'node:module', 'node:fs', 'node:path', 'node:os', 'node:util', 'node:events', 'node:stream', 'node:child_process', 'node:crypto'
+    'node:module',
+    'node:fs',
+    'node:path',
+    'node:os',
+    'node:util',
+    'node:events',
+    'node:stream',
+    'node:child_process',
+    'node:crypto',
   ];
-  
+
   // Ensure all @cli-upkaran/* packages are external except the current one
-  const aiUpkaranExternals = allDependencies
-    .filter(dep => dep.startsWith('@cli-upkaran/') && dep !== pkg.name);
-  
-  const allExternals = [...new Set([...external, ...allDependencies, ...aiUpkaranExternals])];
-  
+  const aiUpkaranExternals = allDependencies.filter(
+    (dep) => dep.startsWith('@cli-upkaran/') && dep !== pkg.name,
+  );
+
+  const allExternals = [
+    ...new Set([...external, ...allDependencies, ...aiUpkaranExternals]),
+  ];
+
   return defineConfig({
     input: path.join(packagePath, input),
     output: [
@@ -49,10 +62,13 @@ export function createConfig(options) {
         format: 'esm',
         // preserveModules: true,
         entryFileNames: '[name].js',
-      }
+      },
     ],
-    external: id => allExternals.some(extDep => id === extDep || id.startsWith(`${extDep}/`)),
+    external: (id) =>
+      allExternals.some(
+        (extDep) => id === extDep || id.startsWith(`${extDep}/`),
+      ),
     // Plugins would go here if we add them later
     // plugins: [],
   });
-} 
+}

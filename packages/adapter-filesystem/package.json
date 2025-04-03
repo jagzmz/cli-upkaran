@@ -1,7 +1,7 @@
 {
   "name": "@cli-upkaran/adapter-filesystem",
   "version": "0.0.1",
-  "description": "Filesystem data preparation adapter for ai-upkaran",
+  "description": "Filesystem data preparation adapter for cli-upkaran",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
@@ -14,7 +14,7 @@
     "test": "echo \"No tests in adapter-filesystem yet\""
   },
   "keywords": [
-    "ai-upkaran",
+    "cli-upkaran",
     "adapter",
     "filesystem",
     "data-preparation"

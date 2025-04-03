@@ -1,8 +1,8 @@
 {
-  "name": "ai-upkaran-root",
+  "name": "cli-upkaran-root",
   "private": true,
   "version": "0.0.1",
-  "description": "Monorepo root for the ai-upkaran toolkit",
+  "description": "Monorepo root for the cli-upkaran toolkit",
   "type": "module",
   "scripts": {
     "build": "pnpm -r run build",

@@ -1,0 +1,17 @@
+# Ignore artifacts
+node_modules
+dist
+.turbo
+coverage
+pnpm-lock.yaml
+
+# Ignore config files managed elsewhere
+*.json
+*.yaml
+*.yml
+*.md
+*.log
+.DS_Store
+
+# Ignore generated/vendored code
+packages/adapter-website/src/readability.js 

@@ -1,0 +1,37 @@
+{
+  "name": "@ai-upkaran/command-fetch",
+  "version": "0.0.1",
+  "description": "The 'fetch' command implementation for ai-upkaran",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -b && rolldown -c",
+    "build:types": "tsc -b",
+    "build:bundle": "rolldown -c",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "lint": "eslint . --ext .ts",
+    "test": "echo \"No tests in command-fetch yet\""
+  },
+  "keywords": [
+    "ai-upkaran",
+    "command",
+    "fetch",
+    "website",
+    "scrape"
+  ],
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@ai-upkaran/core": "workspace:*",
+    "@ai-upkaran/dataprep-core": "workspace:*",
+    "@ai-upkaran/adapter-website": "workspace:*",
+    "commander": "^12.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.20"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+} 

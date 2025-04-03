@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo"
+  },
+  "include": ["src/**/*"],
+  "references": [
+    { "path": "../core" },
+    // Add references to command packages as they are created and used directly
+    // { "path": "../command-digest" },
+    // { "path": "../command-fetch" }
+  ]
+} 

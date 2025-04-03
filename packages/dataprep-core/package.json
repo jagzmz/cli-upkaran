@@ -1,0 +1,36 @@
+{
+  "name": "@ai-upkaran/dataprep-core",
+  "version": "0.0.1",
+  "description": "Core data preparation logic, types, and interfaces for ai-upkaran",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -b && rolldown -c",
+    "build:types": "tsc -b",
+    "build:bundle": "rolldown -c",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "lint": "eslint . --ext .ts",
+    "test": "echo \"No tests in dataprep-core yet\""
+  },
+  "keywords": [
+    "ai-upkaran",
+    "data-preparation",
+    "core"
+  ],
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@ai-upkaran/core": "workspace:*",
+    "ignore": "^5.3.1",
+    "js-tiktoken": "^1.0.12",
+    "micromatch": "^4.0.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.20",
+    "@types/micromatch": "^4.0.7" 
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+} 

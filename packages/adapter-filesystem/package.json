@@ -1,0 +1,38 @@
+{
+  "name": "@ai-upkaran/adapter-filesystem",
+  "version": "0.0.1",
+  "description": "Filesystem data preparation adapter for ai-upkaran",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -b && rolldown -c",
+    "build:types": "tsc -b",
+    "build:bundle": "rolldown -c",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "lint": "eslint . --ext .ts",
+    "test": "echo \"No tests in adapter-filesystem yet\""
+  },
+  "keywords": [
+    "ai-upkaran",
+    "adapter",
+    "filesystem",
+    "data-preparation"
+  ],
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@ai-upkaran/core": "workspace:*",
+    "@ai-upkaran/dataprep-core": "workspace:*",
+    "glob": "^10.3.10",
+    "ignore": "^5.3.1",
+    "isbinaryfile": "^5.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.20",
+    "@types/glob": "^8.1.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+} 

@@ -1,0 +1,45 @@
+{
+  "name": "ai-upkaran-root",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Monorepo root for the ai-upkaran toolkit",
+  "type": "module",
+  "scripts": {
+    "build": "pnpm -r run build",
+    "build:types": "pnpm -r run build:types",
+    "build:bundle": "pnpm -r run build:bundle",
+    "lint": "eslint \"packages/**/*.ts\"",
+    "format": "prettier --check \"packages/**/*.{ts,js,json,md,yaml,cjs}\"",
+    "format:fix": "prettier --write \"packages/**/*.{ts,js,json,md,yaml,cjs}\"",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "pnpm -r run clean && rm -rf node_modules",
+    "prepare": "husky install"
+  },
+  "keywords": [
+    "ai",
+    "cli",
+    "toolkit",
+    "llm",
+    "developer-tools"
+  ],
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20",
+    "@typescript-eslint/eslint-plugin": "^7.16.1",
+    "@typescript-eslint/parser": "^7.16.1",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-prettier": "^5.2.1",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.0",
+    "prettier": "^3.3.3",
+    "rolldown": "1.0.0-beta.7",
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.3"
+  },
+  "packageManager": "pnpm@9.0.2"
+}

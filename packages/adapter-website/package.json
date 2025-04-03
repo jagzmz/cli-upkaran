@@ -1,0 +1,47 @@
+{
+  "name": "@ai-upkaran/adapter-website",
+  "version": "0.0.1",
+  "description": "Website data preparation adapter for ai-upkaran",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -b && rolldown -c",
+    "build:types": "tsc -b",
+    "build:bundle": "rolldown -c",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "lint": "eslint . --ext .ts",
+    "test": "echo \"No tests in adapter-website yet\""
+  },
+  "keywords": [
+    "ai-upkaran",
+    "adapter",
+    "website",
+    "fetch",
+    "scrape",
+    "data-preparation"
+  ],
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@ai-upkaran/core": "workspace:*",
+    "@ai-upkaran/dataprep-core": "workspace:*",
+    "@mozilla/readability": "^0.5.0",
+    "cheerio": "^1.0.0-rc.12",
+    "fast-xml-parser": "^4.3.6",
+    "jsdom": "^26.0.0",
+    "node-fetch": "^3.3.2",
+    "p-queue": "^7.4.1",
+    "turndown": "^7.1.3",
+    "turndown-plugin-gfm": "^1.0.2"
+  },
+  "devDependencies": {
+    "@types/jsdom": "^21.1.7",
+    "@types/node": "^20.11.20",
+    "@types/node-fetch": "^2.6.11",
+    "@types/turndown": "^5.0.4"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

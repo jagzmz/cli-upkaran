@@ -1,3 +1,4 @@
+import path from 'node:path';
 import type { ContentItem } from './content-item.js';
 import type { Writable } from 'node:stream';
 
@@ -35,3 +36,49 @@ export interface Formatter {
     options?: FormatterOptions,
   ): Promise<void>;
 }
+
+export const defaultFormatters= {
+  json: {
+    name: 'json',
+    format: async (items: AsyncIterable<ContentItem>, outputStream: Writable, options?: FormatterOptions) => {
+      for await (const item of items) {
+        outputStream.write(JSON.stringify(item) + '\n');
+      }
+    },
+  },
+  markdown: {
+    name: 'markdown',
+    format: async (items: AsyncIterable<ContentItem>, outputStream: Writable, options?: FormatterOptions) => {
+      for await (const item of items) {
+        let content;
+        if (item.adapter === 'filesystem') {
+          const relativePath = path.relative(process.cwd(), item.metadata?.filePath);
+          const fileType = path.extname(relativePath).slice(1);
+          content = `# ${relativePath}\n\n\`\`\`${fileType}\n${item.content}\n\`\`\`\n\n`;
+        }
+        else {
+          if (item.metadata?.title) {
+            content = `# ${item.metadata.title}\n\n${item.content}\n\n`;
+          } else {
+            content = `${item.content}\n\n`;
+          }
+        }
+        outputStream.write(content);
+      }
+    },
+  },
+  text: {
+    name: 'text',
+    format: async (items: AsyncIterable<ContentItem>, outputStream: Writable, options?: FormatterOptions) => {
+      for await (const item of items) {
+        let content;
+        if (item.metadata?.title) {
+          content = `# ${item.metadata.title}\n\n${item.content}\n\n`;
+        } else {
+          content = `${item.content}\n\n`;
+        }
+        outputStream.write(content);
+      }
+    },
+  },
+} as const;

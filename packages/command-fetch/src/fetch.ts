@@ -6,25 +6,11 @@ import {
   type FormatterOptions,
   type Transformer,
   type Formatter,
-  type ContentItem, // Import Formatter type
-  // TODO: Import specific formatters when they exist
+  type ContentItem,
+  defaultFormatters,
 } from '@cli-upkaran/dataprep-core';
 import { createWebsiteAdapter } from '@cli-upkaran/adapter-website'; // Assuming adapter provides this factory
 import type { FetchOptions } from './options.js';
-
-// Placeholder Formatters
-const createPlaceholderFormatter = (
-  name: 'markdown' | 'json' | 'text',
-): Formatter => ({
-  name,
-  format: async (items: AsyncIterable<ContentItem>, outputStream: any) => {
-    logger.warn(`Using placeholder ${name} formatter.`);
-    for await (const item of items) {
-      outputStream.write(`URL: ${item.source}\nTitle: ${item.metadata?.title}\nContent: ${item.content}\n\n`);
-    }
-    outputStream.write(`--- End ${name} Output ---\n`);
-  },
-});
 
 /**
  * Executes the main logic for the fetch command.
@@ -60,14 +46,14 @@ export async function runFetch(
     let formatter: Formatter;
     switch (options.format) {
       case 'json':
-        formatter = createPlaceholderFormatter('json');
+        formatter = defaultFormatters.json;
         break;
       case 'text':
-        formatter = createPlaceholderFormatter('text');
+        formatter = defaultFormatters.text;
         break;
       case 'markdown':
       default:
-        formatter = createPlaceholderFormatter('markdown');
+        formatter = defaultFormatters.markdown;
     }
     const formatterOptions: FormatterOptions = {
       includeSource: true, // e.g., include <url> tag

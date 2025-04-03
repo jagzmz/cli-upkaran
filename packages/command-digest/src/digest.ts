@@ -8,26 +8,14 @@ import {
   type AdapterOptions,
   type FormatterOptions,
   type Transformer,
+  type ContentItem,
+  defaultFormatters,
   // TODO: Import specific formatters when they exist
   // import { createMarkdownFormatter, createJsonFormatter } from '../formatters';
 } from '@cli-upkaran/dataprep-core';
 import { createFileSystemAdapter } from '@cli-upkaran/adapter-filesystem';
 import type { DigestOptions } from './options.js';
 import { DEFAULT_IGNORES } from './default-ignores.js'; // Define default ignores for digest
-
-// Placeholder Formatters (until real ones are built)
-const createPlaceholderFormatter = (name: 'markdown' | 'json') => ({
-  name,
-  format: async (items: AsyncIterable<any>, outputStream: any) => {
-    logger.warn(`Using placeholder ${name} formatter.`);
-    outputStream.write(`--- Start ${name} Output ---\n`);
-    for await (const item of items) {
-      outputStream.write(`${item.id}\n`);
-      // outputStream.write(JSON.stringify(item) + '\n');
-    }
-    outputStream.write(`--- End ${name} Output ---\n`);
-  },
-});
 
 /**
  * Executes the main logic for the digest command.
@@ -86,8 +74,8 @@ export async function runDigest(
     // TODO: Replace with actual formatters
     const formatter =
       options.format === 'json'
-        ? createPlaceholderFormatter('json')
-        : createPlaceholderFormatter('markdown');
+        ? defaultFormatters.json
+        : defaultFormatters.markdown;
     const formatterOptions: FormatterOptions = {
       includeSource: true, // Example option
     };

@@ -50,7 +50,12 @@ export async function loadCommandPlugins(
         // Validate and add the commands
         pluginsToAdd.forEach((plugin) => {
           if (plugin && plugin.type === 'command' && plugin.commands) {
-            loadedPlugins.push(plugin);
+            // Add the package name to each command definition
+            const commandsWithPackageName = plugin.commands.map((cmd) => ({
+              ...cmd,
+              packageName: nameOrPath, // Add the plugin name/path
+            }));
+            loadedPlugins.push({ ...plugin, commands: commandsWithPackageName });
             logger.success(`Loaded command plugin from: ${nameOrPath}`);
           } else {
             logger.warn(

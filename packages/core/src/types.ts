@@ -22,6 +22,8 @@ export interface CommandDefinition {
   description: string;
   /** Optional aliases for the command */
   aliases?: string[];
+  /** Optional package name from which this command originates */
+  packageName?: string;
   /**
    * Function to configure command-specific options and arguments
    * using the CLI framework's command instance.

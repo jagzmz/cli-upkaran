@@ -11,19 +11,21 @@ import {
 // These imports will likely cause dependency cycles if commands depend on CLI UI.
 // Consider a different registration pattern if needed, e.g., commands register themselves.
 import { registerDigestCommand } from '@cli-upkaran/command-digest';
+import { constructCommandName } from './utils/index.js';
 
 /**
  * Helper function to add a CommandDefinition to the main Commander program.
  * Returns the definition that was added.
  */
 function addCommandToProgram(program: Command, def: CommandDefinition): CommandDefinition {
-  const cmd = program.command(def.name);
+  const commandName = constructCommandName(def.packageName!, def.name);
+  const cmd = program.command(commandName);
   if (def.description) cmd.description(def.description);
   if (def.aliases) cmd.aliases(def.aliases);
 
   // Allow the command definition to configure its own arguments and options
   if (def.configure) {
-    logger.verbose(`Configuring options/args for command: ${def.name}`);
+    logger.verbose(`Configuring options/args for command: ${commandName}`);
     // Type cast to handle the version mismatch between commander types
     def.configure(cmd as any);
   }
@@ -33,7 +35,7 @@ function addCommandToProgram(program: Command, def: CommandDefinition): CommandD
     // Commander passes options object as the last argument, and the command instance before it.
     const options = args[args.length - 2];
     const commandInstance = args[args.length - 1];
-    logger.verbose(`Executing command: ${def.name}`);
+    logger.verbose(`Executing command: ${commandName}`);
     logger.verbose(`With options: ${JSON.stringify(options)}`);
     // Call the handler defined in the CommandDefinition
     await def.handler(options, commandInstance);
@@ -72,7 +74,8 @@ export async function registerAllCommands(
       if (plugin.type === 'command' && plugin.commands) {
         logger.info(`Registering commands from plugin...`); // TODO: identify plugin source
         plugin.commands.forEach((cmdDef: CommandDefinition) => {
-          logger.verbose(`Registering command: ${cmdDef.name}`);
+          const commandName = constructCommandName(cmdDef.packageName!, cmdDef.name);
+          logger.verbose(`Registering command: ${commandName}`);
           const registeredDef = addCommandToProgram(program, cmdDef);
           registeredDefinitions.push(registeredDef);
         });

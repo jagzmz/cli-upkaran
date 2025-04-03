@@ -7,6 +7,7 @@ import {
   type CommandDefinition,
 } from '@cli-upkaran/core';
 import ora from 'ora';
+import { constructCommandName } from './utils/index.js';
 
 // Helper to dynamically build prompts based on command options
 // This is complex and requires a good way to represent option types
@@ -121,11 +122,15 @@ export async function runInteractive(
 
   const selectedCommandName = await p.select({
     message: 'Which command would you like to run?',
-    options: availableCommands.map((cmd) => ({
-      value: cmd.name,
-      label: cmd.name,
-      hint: cmd.description,
-    })),
+    options: availableCommands.map((cmd) => {
+      const packageName = cmd.packageName ?? 'unknown-package';
+      const commandName = constructCommandName(packageName, cmd.name);
+      return {
+        value: commandName,
+        label: commandName,
+        hint: cmd.description,
+      }
+    }),
   });
 
   if (p.isCancel(selectedCommandName)) {
@@ -174,7 +179,7 @@ export async function runInteractive(
   try {
     // Find the original definition from the list we already have
     const originalDefinition = availableCommands.find(
-      (def) => def.name === selectedCommandName,
+      (def) => constructCommandName(def.packageName!, def.name) === selectedCommandName,
     );
     if (originalDefinition?.handler) {
       // Set the collected arguments on the command instance before calling the handler

@@ -11,12 +11,12 @@ import {
 // These imports will likely cause dependency cycles if commands depend on CLI UI.
 // Consider a different registration pattern if needed, e.g., commands register themselves.
 import { registerDigestCommand } from '@ai-upkaran/command-digest';
-import { registerFetchCommand } from '@ai-upkaran/command-fetch';
 
 /**
  * Helper function to add a CommandDefinition to the main Commander program.
+ * Returns the definition that was added.
  */
-function addCommandToProgram(program: Command, def: CommandDefinition) {
+function addCommandToProgram(program: Command, def: CommandDefinition): CommandDefinition {
   const cmd = program.command(def.name);
   if (def.description) cmd.description(def.description);
   if (def.aliases) cmd.aliases(def.aliases);
@@ -38,21 +38,24 @@ function addCommandToProgram(program: Command, def: CommandDefinition) {
     // Call the handler defined in the CommandDefinition
     await def.handler(options, commandInstance);
   });
+
+  return def; // Return the definition
 }
 
 /**
  * Registers all commands (built-in and plugins) with the Commander program.
+ * Returns an array of the registered CommandDefinitions.
  */
 export async function registerAllCommands(
   program: Command,
   config: GlobalConfig,
-) {
+): Promise<CommandDefinition[]> {
   logger.info('Registering commands...');
+  const registeredDefinitions: CommandDefinition[] = [];
 
   // 1. Register built-in commands (Placeholder - uncomment when command packages exist)
   logger.verbose('Registering built-in commands...');
   // registerDigestCommand(program); // Example
-  // registerFetchCommand(program); // Example
   // --- Add calls to register other built-in commands here ---
   // logger.warn('Built-in command registration is currently commented out.');
 
@@ -70,7 +73,8 @@ export async function registerAllCommands(
         logger.info(`Registering commands from plugin...`); // TODO: identify plugin source
         plugin.commands.forEach((cmdDef: CommandDefinition) => {
           logger.verbose(`Registering command: ${cmdDef.name}`);
-          addCommandToProgram(program, cmdDef);
+          const registeredDef = addCommandToProgram(program, cmdDef);
+          registeredDefinitions.push(registeredDef);
         });
       }
     });
@@ -79,4 +83,5 @@ export async function registerAllCommands(
   }
 
   logger.info('Command registration complete.');
+  return registeredDefinitions; // Return the collected definitions
 }

@@ -1,5 +1,5 @@
 import type { Command } from 'commander';
-import { Option } from 'commander';
+import { Argument, Option } from 'commander';
 
 // Define the structure of options specific to the fetch command
 export interface FetchOptions {
@@ -23,6 +23,7 @@ export interface FetchOptions {
  */
 export function configureFetchOptions(command: Command) {
   command
+    .addArgument(new Argument('<url_or_sitemap_path>', 'URL or sitemap path'))
     .addOption(
       new Option('-o, --output <file>', 'Output file path').default(
         'site_content.md',
@@ -33,13 +34,17 @@ export function configureFetchOptions(command: Command) {
         .choices(['markdown', 'json', 'text'])
         .default('markdown'),
     )
-    .option(
-      '-m, --match <patterns...>',
-      'Micromatch glob patterns for pathnames to include',
+    .addOption(
+      new Option(
+        '-m, --match <patterns...>',
+        'Micromatch glob patterns for pathnames to include',
+      ),
     )
-    .option(
-      '--selector <selector>',
-      'CSS selector to extract main content area',
+    .addOption(
+      new Option(
+        '--selector <selector>',
+        'CSS selector to extract main content area',
+      ),
     )
     .addOption(
       new Option('-c, --concurrency <number>', 'Number of concurrent requests')
@@ -64,7 +69,7 @@ export function configureFetchOptions(command: Command) {
       new Option(
         '--use-sitemap',
         'Prefer sitemap.xml for discovery if available at root or specified path',
-      ).default(true),
+      ).default(false),
     )
     // .option('--auth <user:pass>', 'Basic authentication credentials')
     .addOption(

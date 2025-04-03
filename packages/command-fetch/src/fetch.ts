@@ -5,7 +5,8 @@ import {
   type AdapterOptions,
   type FormatterOptions,
   type Transformer,
-  type Formatter, // Import Formatter type
+  type Formatter,
+  type ContentItem, // Import Formatter type
   // TODO: Import specific formatters when they exist
 } from '@ai-upkaran/dataprep-core';
 import { createWebsiteAdapter } from '@ai-upkaran/adapter-website'; // Assuming adapter provides this factory
@@ -16,12 +17,10 @@ const createPlaceholderFormatter = (
   name: 'markdown' | 'json' | 'text',
 ): Formatter => ({
   name,
-  format: async (items: AsyncIterable<any>, outputStream: any) => {
+  format: async (items: AsyncIterable<ContentItem>, outputStream: any) => {
     logger.warn(`Using placeholder ${name} formatter.`);
-    outputStream.write(`--- Start ${name} Output ---\n`);
     for await (const item of items) {
-      outputStream.write(`${item.id}\n`); // Use item.id (URL) as placeholder
-      // outputStream.write(JSON.stringify(item) + '\n');
+      outputStream.write(`URL: ${item.source}\nTitle: ${item.metadata?.title}\nContent: ${item.content}\n\n`);
     }
     outputStream.write(`--- End ${name} Output ---\n`);
   },

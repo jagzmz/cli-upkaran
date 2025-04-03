@@ -1,4 +1,4 @@
-import type { Command } from 'commander';
+import type { Command, Argument } from 'commander';
 import * as p from '@clack/prompts';
 import chalk from 'chalk';
 import {
@@ -7,30 +7,6 @@ import {
   type CommandDefinition,
 } from '@ai-upkaran/core';
 import ora from 'ora';
-
-// Helper function to get available commands from the program
-function getAvailableCommands(program: Command): CommandDefinition[] {
-  // This is a simplification. It assumes commands were registered with
-  // the necessary details accessible or reconstructible.
-  // A more robust approach might involve storing CommandDefinition objects during registration.
-  return program.commands.map((cmd) => ({
-    name: cmd.name(),
-    description: cmd.description(),
-    aliases: cmd.aliases(),
-    // We might not have the original configure/handler here easily
-    // For interactive mode, we might need a different way to get option details
-    configure: (c: Command) => {
-      logger.warn(
-        `Interactive mode cannot fully reconstruct configure for ${c.name()}`,
-      );
-    },
-    handler: async () => {
-      logger.error(
-        `Cannot execute command ${cmd.name()} solely from interactive reconstruction.`,
-      );
-    },
-  })) as any;
-}
 
 // Helper to dynamically build prompts based on command options
 // This is complex and requires a good way to represent option types
@@ -47,7 +23,7 @@ async function promptForCommandOptions(command: Command): Promise<any> {
     const defaultValue = option.defaultValue;
     const isBoolean =
       !option.flags.includes('<') && !option.flags.includes('[');
-    const isRequired = option.required; // Note: Commander's .required doesn't always map perfectly to prompt requirement
+    const isRequired = option.required === false; // Note: Commander's .required doesn't always map perfectly to prompt requirement
     const name = option.attributeName(); // e.g., 'output'
 
     logger.verbose(`Prompting for option: ${name} (Flags: ${flags})`);
@@ -64,8 +40,10 @@ async function promptForCommandOptions(command: Command): Promise<any> {
         message: `${description}:`,
         placeholder: defaultValue ? `Default: ${defaultValue}` : 'Enter value',
         validate: (value) => {
-          // Basic required check - might need more robust validation
-          if (isRequired && !value) return 'Value is required!';
+          // Only require input if the option is required AND has NO default value
+          if (isRequired && !value && defaultValue === undefined) {
+             return 'Value is required!';
+          }
         },
       });
       if (p.isCancel(value)) {
@@ -79,13 +57,62 @@ async function promptForCommandOptions(command: Command): Promise<any> {
   return options;
 }
 
+// NEW Helper to prompt for command arguments
+async function promptForCommandArguments(command: Command): Promise<string[]> {
+  const args: string[] = [];
+  // Use type assertion to access internal _args
+  const argumentDefinitions = (command as any)._args as Argument[]; 
+
+  logger.verbose(`Prompting for arguments of command: ${command.name()}`);
+  
+  if (argumentDefinitions && argumentDefinitions.length > 0) {
+     p.intro(`Configure arguments for ${chalk.cyan(command.name())}`);
+  }
+
+  for (const argDef of argumentDefinitions) {
+    // Argument names might be like '<url_or_sitemap_path>'
+    const name = argDef.name(); 
+    const description = argDef.description || `Value for ${name}`;
+
+    // Check if argument is required (e.g., <arg> vs [arg])
+    const isRequired = argDef.required;
+
+    logger.verbose(`Prompting for argument: ${name} (Required: ${isRequired})`);
+
+    const value = await p.text({
+      message: `${description}:`,
+      placeholder: isRequired ? 'Required' : 'Optional, press Enter to skip',
+      validate: (value) => {
+        if (isRequired && !value) return `${name} is required!`;
+      },
+    });
+
+    if (p.isCancel(value)) {
+       p.outro(chalk.yellow('Argument input cancelled.'));
+       process.exit(0);
+    }
+    // Only add if value is provided (or if required, validation ensures it's provided)
+    if (value) {
+        args.push(value);
+    } else if (isRequired) {
+        // This case should ideally be caught by validation, but as a fallback:
+        logger.error(`Required argument ${name} was not provided despite prompt.`);
+        throw new Error(`Missing required argument: ${name}`);
+    }
+    // If optional and no value provided, we simply don't add it to args
+  }
+  return args;
+}
+
 /**
  * Runs the interactive mode using @clack/prompts.
  */
-export async function runInteractive(program: Command, config: GlobalConfig) {
+export async function runInteractive(
+  program: Command, 
+  config: GlobalConfig,
+  availableCommands: CommandDefinition[]
+) {
   p.intro(chalk.inverse(` ${chalk.bold('ai-upkaran Interactive Mode')} `));
-
-  const availableCommands = getAvailableCommands(program);
 
   if (availableCommands.length === 0) {
     p.log.warning('No commands available to run interactively.');
@@ -118,12 +145,19 @@ export async function runInteractive(program: Command, config: GlobalConfig) {
     process.exit(1);
   }
 
-  // --- Prompt for options --- S
+  // --- Prompt for Arguments ---
+  const collectedArguments = await promptForCommandArguments(selectedCommand);
+
+  // --- Prompt for Options ---
   const commandOptions = await promptForCommandOptions(selectedCommand);
 
-  // --- Confirmation --- S
+  // --- Confirmation ---
   p.log.step('Summary:');
   console.log(chalk.gray(` Command: ${chalk.cyan(selectedCommandName)}`));
+  // Add Arguments to summary
+  if (collectedArguments.length > 0) {
+    console.log(chalk.gray(` Arguments: ${JSON.stringify(collectedArguments)}`));
+  }
   console.log(chalk.gray(` Options: ${JSON.stringify(commandOptions)}`));
 
   const shouldProceed = await p.confirm({
@@ -135,16 +169,17 @@ export async function runInteractive(program: Command, config: GlobalConfig) {
     process.exit(0);
   }
 
-  // --- Execution --- S
+  // --- Execution ---
   const spinner = ora(`Running ${selectedCommandName}...`).start();
   try {
-    // Find the original handler to execute
-    // This relies on the handler being correctly attached during registration
+    // Find the original definition from the list we already have
     const originalDefinition = availableCommands.find(
       (def) => def.name === selectedCommandName,
     );
     if (originalDefinition?.handler) {
-      await originalDefinition.handler(commandOptions, selectedCommand as any);
+      // Set the collected arguments on the command instance before calling the handler
+      selectedCommand.args = collectedArguments; 
+      await originalDefinition.handler(commandOptions, selectedCommand); // Pass the updated command
       spinner.succeed(`${selectedCommandName} completed successfully.`);
     } else {
       // Fallback if handler wasn't reconstructed - this shouldn't happen ideally

@@ -9,6 +9,7 @@ import {
   setVerbose,
   AiUpkaranError,
   type GlobalConfig,
+  type CommandDefinition,
 } from '@ai-upkaran/core';
 import { createRequire } from 'node:module';
 
@@ -57,7 +58,10 @@ async function main() {
   logger.verbose('Parsed global options:', globalOpts);
 
   // Register built-in and plugin commands, passing the loaded config
-  await registerAllCommands(program, config);
+  const allCommandDefinitions: CommandDefinition[] = await registerAllCommands(
+    program,
+    config,
+  );
 
   // Decide whether to run interactive mode or parse a specific command
   const commandArgs = process.argv.slice(2);
@@ -82,7 +86,7 @@ async function main() {
     logger.info(
       'No command specified or only global options provided, entering interactive mode...',
     );
-    await runInteractive(program, config);
+    await runInteractive(program, config, allCommandDefinitions);
   } else {
     // Let commander handle the command parsing and execution
     await program.parseAsync(process.argv);

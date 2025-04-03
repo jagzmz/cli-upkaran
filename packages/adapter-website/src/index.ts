@@ -9,6 +9,7 @@ import {
 import { fetchUrl, type FetchResult } from './fetch-utils.js';
 import { extractReadableContent, type ProcessedPage } from './readability.js';
 import { discoverUrls } from './discovery.js';
+import ora from 'ora';
 
 const ADAPTER_NAME = 'website';
 
@@ -74,14 +75,24 @@ class WebsiteAdapter implements Adapter {
         return;
       }
 
-      logger.info(`[${this.name}] Fetching: ${url} (Depth: ${depth})`);
+      const spinner = ora(`Fetching: ${url} (Depth: ${depth})`);
+
       let fetchResult: FetchResult | null = null;
       let fetchError: Error | undefined;
       try {
+        spinner.start();
         fetchResult = await fetchUrl(url, controller.signal);
       } catch (error: any) {
         logger.warn(`[${this.name}] Failed to fetch ${url}: ${error.message}`);
         fetchError = new Error(`Fetch failed: ${error.message}`);
+      } finally {
+        if (controller.signal.aborted) {
+           spinner.warn(`Aborted: ${url}`); 
+        } else if (fetchError) {
+           spinner.fail(`Failed: ${url}`);
+        } else {
+           spinner.succeed(`Fetched: ${url} (${fetchResult?.status ?? '?'})`);
+        }
       }
 
       if (controller.signal.aborted) {
@@ -148,12 +159,15 @@ class WebsiteAdapter implements Adapter {
             fetchResult.content,
             url,
             source,
+            options.useSitemap,
           );
           for (const nextUrl of discovered) {
             if (
               !processedUrls.has(nextUrl) &&
               (!limit || fetchedCount < limit)
             ) {
+              // Log adding subsequent URLs
+              logger.verbose(`[${this.name}] Adding discovered URL to queue: ${nextUrl}`);
               queue.add(() => processUrl(nextUrl, depth + 1));
             }
           }
@@ -180,34 +194,45 @@ class WebsiteAdapter implements Adapter {
       logger.warn(
         `[${this.name}] No initial URLs found from source: ${source}`,
       );
-      // Still yield buffer in case source URL itself should be processed once?
-      // Let's queue the source itself if it seems like a single page URL
       if (!source.toLowerCase().endsWith('.xml')) {
-        // Simple check
         logger.info(`[${this.name}] Treating source as single URL to fetch.`);
         queue.add(() => processUrl(source, 0));
       } else {
-        return; // No URLs from sitemap/source
+         // If no initial URLs and it looks like a sitemap, yield nothing and exit.
+         logger.info(`[${this.name}] No URLs found in sitemap, finishing stream.`);
+         return; 
       }
     } else {
       logger.info(
         `[${this.name}] Starting crawl/fetch with ${initialUrls.length} initial URLs.`,
       );
-      initialUrls.forEach((url) => queue.add(() => processUrl(url, 0)));
+      // Log the initial URLs found
+      logger.verbose(`[${this.name}] Initial URLs: ${JSON.stringify(initialUrls)}`); 
+      initialUrls.forEach((url) => {
+         logger.verbose(`[${this.name}] Adding initial URL to queue: ${url}`);
+         queue.add(() => processUrl(url, 0))
+      });
     }
 
-    // Wait for the queue to finish processing all URLs
-    await queue.onIdle();
+    // Stream results as they become available
+    logger.verbose(`[${this.name}] Entering streaming loop...`);
+    while (queue.size > 0 || queue.pending > 0 || resultsBuffer.length > 0) {
+      // Log queue and buffer state at start of loop iteration
+      logger.verbose(`[${this.name}] Loop State - Queue Size: ${queue.size}, Pending: ${queue.pending}, Buffer Length: ${resultsBuffer.length}`);
+
+      // Yield all items currently in the buffer
+      while (resultsBuffer.length > 0) {
+        yield resultsBuffer.shift()!;
+      }
+      // If buffer is empty but queue is still processing, wait briefly
+      if (resultsBuffer.length === 0 && (queue.size > 0 || queue.pending > 0)) {
+        await new Promise(resolve => setTimeout(resolve, 50)); // Small delay
+      }
+    }
+
     logger.info(
-      `[${this.name}] Fetching and processing complete. Yielding ${resultsBuffer.length} results.`,
+      `[${this.name}] Queue idle and buffer empty. Finished yielding all items.`,
     );
-
-    // Yield all results from the buffer
-    for (const item of resultsBuffer) {
-      yield item;
-    }
-
-    logger.info(`[${this.name}] Finished yielding all items.`);
   }
 }
 

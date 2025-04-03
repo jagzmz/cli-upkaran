@@ -99,9 +99,15 @@ importers:
       jsdom:
         specifier: ^26.0.0
         version: 26.0.0
+      micromatch:
+        specifier: ^4.0.7
+        version: 4.0.8
       node-fetch:
         specifier: ^3.3.2
         version: 3.3.2
+      ora:
+        specifier: ^8.0.1
+        version: 8.2.0
       p-queue:
         specifier: ^7.4.1
         version: 7.4.1
@@ -115,12 +121,21 @@ importers:
       '@types/jsdom':
         specifier: ^21.1.7
         version: 21.1.7
+      '@types/micromatch':
+        specifier: ^4.0.7
+        version: 4.0.9
+      '@types/mozilla__readability':
+        specifier: ^0.4.2
+        version: 0.4.2
       '@types/node':
         specifier: ^20.11.20
         version: 20.17.30
       '@types/node-fetch':
         specifier: ^2.6.11
         version: 2.6.12
+      '@types/ora':
+        specifier: ^3.2.0
+        version: 3.2.0
       '@types/turndown':
         specifier: ^5.0.4
         version: 5.0.5
@@ -904,6 +919,9 @@ packages:
 
   '@types/minimatch@5.1.2':
     resolution: {integrity: sha512-K0VQKziLUWkVKiRVrx4a40iPaxTUefQmjtkQofBkYRcoaaL/8rhwDWww9qWbrgicNOgnpIsMxyNIUM4+n6dUIA==}
+
+  '@types/mozilla__readability@0.4.2':
+    resolution: {integrity: sha512-mXHoZZ/Knps7GABAG9D512yDLCMQNOvQBqzIZpFJnRJveHc528rltnXh6EZTi1RiB1I2Z8yV35Dzs6DhE2WaYw==}
 
   '@types/node-fetch@2.6.12':
     resolution: {integrity: sha512-8nneRWKCg3rMtF69nLQJnOYUcbafYeFSjqkw3jCRLsqkWFlHaoQrr5mXmofFGOx3DKn7UfmBMyov8ySvLRVldA==}
@@ -3812,6 +3830,8 @@ snapshots:
       '@types/braces': 3.0.5
 
   '@types/minimatch@5.1.2': {}
+
+  '@types/mozilla__readability@0.4.2': {}
 
   '@types/node-fetch@2.6.12':
     dependencies:

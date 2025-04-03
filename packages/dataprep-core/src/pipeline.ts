@@ -55,32 +55,21 @@ export async function runPipeline(
       options.transformContext || {},
     );
 
-    // 3. Format and Write Output
-    // We need to consume the transformed stream here to count items and errors
-    // before passing it to the formatter, or modify the formatter to return counts.
-    // Let's consume it here for simplicity, though less memory efficient for huge datasets.
-
-    const itemsToFormat: ContentItem[] = [];
-    for await (const item of transformedStream) {
-      itemCount++;
-      if (item.error) {
-        errorCount++;
-        logger.warn(`Error processing item ${item.id}: ${item.error.message}`);
-        logger.verbose(item.error.stack);
-        // Decide whether to include errored items in the output - currently including
-      }
-      itemsToFormat.push(item);
-    }
-
-    // Convert the array back to an async iterable for the formatter
-    async function* itemGenerator() {
-      for (const item of itemsToFormat) {
+    async function *transformedStreamWrapper() {
+      for await (const item of transformedStream) {
+        itemCount++;
+        if (item.error) {
+          errorCount++;
+          logger.warn(`Error processing item ${item.id}: ${item.error.message}`);
+          logger.verbose(item.error.stack);
+          // Decide whether to include errored items in the output - currently including
+        }
         yield item;
       }
     }
 
     await formatter.format(
-      itemGenerator(),
+      transformedStreamWrapper(),
       outputStream,
       options.formatterOptions,
     );

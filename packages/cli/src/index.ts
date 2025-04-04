@@ -11,10 +11,21 @@ import {
   AiUpkaranError,
   type GlobalConfig,
   type CommandDefinition,
+  addPluginToGlobalConfig,
 } from '@cli-upkaran/core';
 import { createRequire } from 'node:module';
+import { exec } from 'node:child_process';
+import util from 'node:util';
+import readline from 'node:readline/promises';
+// Import helpers from utils
+import {
+    askConfirmation,
+    checkLocalPlugin,
+    checkNpmAvailability,
+    installPluginGlobally,
+} from './utils/index.js';
 
-// Helper to read package.json
+// Helper require (can be used for local resolution checks)
 const require = createRequire(import.meta.url);
 const packageJson = require('../package.json');
 
@@ -35,15 +46,73 @@ async function main() {
     // Collect multiple plugin options into an array
     .option(
       '--plugin <path_or_name>',
-      'Load a command plugin (can be specified multiple times)',
+      'Load specific command plugin(s) (overrides registry)',
       (value, previous: string[] = []) => previous.concat(value),
+      [] // Ensure default is an empty array
     );
   // TODO: Add --config option
 
   // Parse global options early to set up logger and config
   // Use parseOptions to avoid executing default command/help
   program.parseOptions(process.argv);
-  const globalOpts = program.opts();
+  let globalOpts = program.opts(); // Use let as we might modify globalOpts.plugin
+
+  // --- Pre-check and Install Logic for --plugin --- 
+  if (globalOpts.plugin && globalOpts.plugin.length > 0) {
+    logger.verbose('Validating plugins provided via --plugin...');
+    const validatedPlugins: string[] = [];
+    for (const requestedPlugin of globalOpts.plugin) {
+      let resolvedPath = checkLocalPlugin(requestedPlugin);
+      if (resolvedPath) {
+        logger.verbose(`Plugin '${requestedPlugin}' found locally.`);
+        validatedPlugins.push(requestedPlugin); // Keep it in the list
+        continue; // Already available
+      }
+
+      logger.warn(`Plugin '${requestedPlugin}' not found locally.`);
+      const isAvailableOnNpm = await checkNpmAvailability(requestedPlugin);
+
+      if (!isAvailableOnNpm) {
+        logger.error(`Plugin '${requestedPlugin}' not found locally or on npm registry.`);
+        process.exit(1); // Exit if explicitly requested plugin is unavailable
+      }
+
+      const installConfirmed = await askConfirmation(
+        `Plugin '${requestedPlugin}' is available on npm. Install it globally?`
+      );
+
+      if (!installConfirmed) {
+        logger.warn('Installation declined. Exiting.');
+        process.exit(1); // Exit if user declines install for requested plugin
+      }
+
+      const installSuccess = await installPluginGlobally(requestedPlugin);
+      if (!installSuccess) {
+        logger.error(`Failed to install '${requestedPlugin}'. Exiting.`);
+        process.exit(1); // Exit if install fails
+      }
+
+      // After successful install, resolve again and add to registry
+      resolvedPath = checkLocalPlugin(requestedPlugin);
+      if (!resolvedPath) {
+         logger.error(`Failed to resolve '${requestedPlugin}' after installation. Exiting.`);
+         process.exit(1);
+      }
+
+      logger.info(`Registering newly installed plugin '${requestedPlugin}'...`);
+      await addPluginToGlobalConfig({
+          name: requestedPlugin,
+          path: resolvedPath,
+          options: {}
+      });
+      // Keep it in the list for this run
+      validatedPlugins.push(requestedPlugin);
+    }
+    // Update globalOpts to only contain validated/installed plugins for this run
+    globalOpts.plugin = validatedPlugins;
+    logger.verbose(`Proceeding with validated --plugin list: ${validatedPlugins.join(', ')}`);
+  }
+  // --- End Pre-check --- 
 
   // Load configuration (passing initial CLI args)
   const config: GlobalConfig = await loadGlobalConfig(globalOpts);

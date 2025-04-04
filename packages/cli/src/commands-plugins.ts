@@ -10,23 +10,14 @@ import { createRequire } from 'node:module';
 import { exec } from 'node:child_process';
 import util from 'node:util';
 import readline from 'node:readline/promises';
+// Import askConfirmation from utils
+import { askConfirmation } from './utils/index.js';
 
 // Promisify exec for easier async/await usage
 const execPromise = util.promisify(exec);
 
 // Helper to resolve modules relative to this file
 const require = createRequire(import.meta.url);
-
-// Function to ask for confirmation
-async function askConfirmation(query: string): Promise<boolean> {
-    const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout,
-    });
-    const answer = await rl.question(`${query} (yes/no): `);
-    rl.close();
-    return answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'y';
-}
 
 export function registerPluginCommands(program: Command) {
     const pluginsCommand = program.command('plugins')

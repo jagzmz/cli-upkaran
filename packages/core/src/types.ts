@@ -2,14 +2,22 @@
 // Replace with the actual type from the chosen CLI framework (commander or cac)
 import type { Command } from 'commander';
 
+
+export interface PluginConfig {
+  name: string;
+  path: string;
+  options: Record<string, any>;
+}
+
 /**
  * Global configuration for cli-upkaran CLI
  */
 export interface GlobalConfig {
+  version: string;
   verbose: boolean;
   noColor: boolean;
   configPath?: string;
-  pluginPaths?: string[];
+  plugins?: PluginConfig[];
 }
 
 /**
@@ -44,6 +52,17 @@ export interface CommandPlugin {
   /** Distinguishes this plugin type */
   type: 'command';
   /** An array of command definitions provided by this plugin */
+  commands: CommandDefinition[];
+  /** The name of the plugin */
+  name: string;
+}
+
+/**
+ * Represents a command plugin after its commands have been loaded.
+ * Includes the original configuration and the loaded command definitions.
+ */
+export interface LoadedCommandPlugin extends PluginConfig {
+  type: 'command';
   commands: CommandDefinition[];
 }
 

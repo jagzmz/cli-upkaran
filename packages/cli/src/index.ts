@@ -76,18 +76,13 @@ async function main() {
   const knownCommands = program.commands
     .map((cmd) => cmd.name())
     .concat(program.commands.flatMap((cmd) => cmd.aliases()));
-  const commandProvided = commandArgs.some(
-    (arg) =>
-      knownCommands.includes(arg) ||
-      program.commands.some(
-        (cmd) => cmd.args.includes(arg) && !arg.startsWith('-'),
-      ),
-  );
+  // Check if any command-line argument explicitly matches a known command name or alias
+  const commandProvided = commandArgs.some((arg) => knownCommands.includes(arg));
 
   const isInteractiveTrigger = !commandProvided && !isHelp && !isVersion;
 
   if (isInteractiveTrigger) {
-    logger.info(
+    logger.verbose(
       'No command specified or only global options provided, entering interactive mode...',
     );
     await runInteractive(program, config, allCommandDefinitions);

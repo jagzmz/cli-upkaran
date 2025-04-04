@@ -2,80 +2,110 @@ import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { logger } from './logger.js'; // Use .js extension for ESM compatibility
-import type { CommandPlugin, RegisterCommandsFn } from './types.js'; // Use .js extension
+import type {
+  PluginConfig,
+  LoadedCommandPlugin,
+  CommandDefinition,
+  CommandPlugin, // The structure returned by registerCommands
+} from './types.js';
 
+// Helper to get the require function relative to this module
+// This is still useful for require.resolve
 const require = createRequire(import.meta.url);
 
 /**
- * Dynamically loads command plugins.
+ * Dynamically loads command plugins based on the provided configurations.
  *
- * @param pluginPathsOrNames - An array of plugin package names or paths to plugin modules.
- * @returns A promise resolving to an array of loaded CommandPlugin objects.
+ * @param pluginConfigs - An array of plugin configurations (name, path, options).
+ * @returns A promise resolving to an array of successfully loaded command plugin definitions.
  */
 export async function loadCommandPlugins(
-  pluginPathsOrNames: string[],
-): Promise<CommandPlugin[]> {
-  const loadedPlugins: CommandPlugin[] = [];
+  pluginConfigs: PluginConfig[],
+): Promise<LoadedCommandPlugin[]> {
+  const loadedPlugins: LoadedCommandPlugin[] = [];
   logger.verbose(
-    `Attempting to load plugins: ${pluginPathsOrNames.join(', ')}`,
+    `Attempting to load ${pluginConfigs.length} plugin configurations...`,
   );
 
-  for (const nameOrPath of pluginPathsOrNames) {
-    try {
-      // Attempt to resolve the plugin path/name
-      // Use require.resolve to handle both file paths and package names
-      const resolvedPath = require.resolve(nameOrPath);
-      logger.verbose(`Resolved plugin path: ${resolvedPath}`);
+  for (const config of pluginConfigs) {
+    const { name: pluginName, path: pluginPath, options: pluginOptions } = config;
+    let resolvedPath: string;
+    let modulePathToImport: string;
 
-      // Dynamically import the module - use fileURLToPath for Windows compatibility if needed
-      // For simplicity, assuming POSIX paths for now, but fileURLToPath is safer cross-platform
-      const pluginModule = await import(resolvedPath);
-      logger.verbose(`Successfully imported module: ${nameOrPath}`);
+    try {
+      // Resolve the plugin path: Absolute paths and package names are handled directly.
+      // Relative paths need to be resolved relative to the CWD.
+      if (path.isAbsolute(pluginPath) || !pluginPath.match(/^\.\.?[\\\/]/)) {
+        // Absolute path or potential package name
+        resolvedPath = require.resolve(pluginPath);
+        logger.verbose(`Resolved plugin '${pluginName}' (package/absolute) to: ${resolvedPath}`);
+      } else {
+        // Relative path - resolve relative to the current working directory
+        resolvedPath = path.resolve(process.cwd(), pluginPath);
+        logger.verbose(`Resolved plugin '${pluginName}' (relative) to CWD: ${resolvedPath}`);
+      }
+
+      // Determine the path for dynamic import (may need file:// URL)
+      // Simple approach for now, might need refinement for edge cases/Windows
+      modulePathToImport = resolvedPath;
+      // Consider using pathToFileURL if imports fail on Windows
+      // modulePathToImport = pathToFileURL(resolvedPath).href;
+
+      // Dynamically import the module
+      const pluginModule = await import(modulePathToImport);
+      logger.verbose(`Successfully imported module: ${pluginName} from ${modulePathToImport}`);
 
       // Check for the registration function (e.g., registerCommands)
       if (
         pluginModule.registerCommands &&
         typeof pluginModule.registerCommands === 'function'
       ) {
-        const registrationFn =
-          pluginModule.registerCommands as RegisterCommandsFn;
-        // TODO: Pass relevant CLI options if needed by the plugin
-        const registrationResult = registrationFn();
-        logger.verbose(`Called registerCommands for ${nameOrPath}`);
+        // Assuming registerCommands returns CommandPlugin | CommandPlugin[]
+        const registrationResult: CommandPlugin | CommandPlugin[] =
+          pluginModule.registerCommands();
+        logger.verbose(`Called registerCommands for ${pluginName}`);
 
-        const pluginsToAdd = Array.isArray(registrationResult)
+        const pluginsPartsToAdd = Array.isArray(registrationResult)
           ? registrationResult
           : [registrationResult];
 
-        // Validate and add the commands
-        pluginsToAdd.forEach((plugin) => {
-          if (plugin && plugin.type === 'command' && plugin.commands) {
-            // Add the package name to each command definition
-            const commandsWithPackageName = plugin.commands.map((cmd) => ({
-              ...cmd,
-              packageName: nameOrPath, // Add the plugin name/path
-            }));
-            loadedPlugins.push({ ...plugin, commands: commandsWithPackageName });
-            logger.success(`Loaded command plugin from: ${nameOrPath}`);
+        pluginsPartsToAdd.forEach((pluginDefPart) => {
+          if (pluginDefPart?.type === 'command' && pluginDefPart.commands) {
+            // Explicitly type cmd parameter
+            const commandsWithPackageName = pluginDefPart.commands.map(
+              (cmd: CommandDefinition) => ({
+                ...cmd,
+                packageName: pluginName, // Use name from original config
+              }),
+            );
+
+            // Construct the LoadedCommandPlugin object
+            const loadedPlugin: LoadedCommandPlugin = {
+              ...config, // Spread original config (name, path, options)
+              type: 'command', // Add type from loaded part
+              commands: commandsWithPackageName, // Add processed commands
+            };
+            loadedPlugins.push(loadedPlugin);
+            logger.verbose(`Processed command plugin: ${pluginName}`);
           } else {
             logger.warn(
-              `Invalid plugin structure returned by registerCommands in ${nameOrPath}. Skipping.`,
+              `Invalid plugin structure returned by registerCommands in ${pluginName}. Skipping part.`,
             );
           }
         });
       } else {
         logger.warn(
-          `Plugin module ${nameOrPath} does not export a 'registerCommands' function. Skipping.`,
+          `Plugin module ${pluginName} does not export a 'registerCommands' function. Skipping.`,
         );
       }
     } catch (error) {
-      logger.error(`Failed to load plugin from ${nameOrPath}:`, error);
+      logger.error(`Failed to load plugin '${pluginName}' from path '${pluginPath}':`, error);
       // Optionally re-throw or continue loading others
     }
   }
 
-  logger.info(
-    `Finished loading plugins. Total command plugins loaded: ${loadedPlugins.length}`,
+  logger.verbose(
+    `Finished processing plugins. Total command plugins loaded: ${loadedPlugins.length}`,
   );
   return loadedPlugins;
 }

@@ -5,7 +5,11 @@ import {
   type CommandPlugin,
   type CommandDefinition,
   type GlobalConfig,
+  printTree,
+  type PluginConfig,
+  type LoadedCommandPlugin,
 } from '@cli-upkaran/core';
+import Table from 'cli-table3';
 
 // --- Import built-in command registration functions --- S
 // These imports will likely cause dependency cycles if commands depend on CLI UI.
@@ -17,7 +21,10 @@ import { constructCommandName } from './utils/index.js';
  * Helper function to add a CommandDefinition to the main Commander program.
  * Returns the definition that was added.
  */
-function addCommandToProgram(program: Command, def: CommandDefinition): CommandDefinition {
+function addCommandToProgram(
+  program: Command,
+  def: CommandDefinition,
+): CommandDefinition {
   const commandName = constructCommandName(def.packageName!, def.name);
   const cmd = program.command(commandName);
   if (def.description) cmd.description(def.description);
@@ -52,7 +59,7 @@ export async function registerAllCommands(
   program: Command,
   config: GlobalConfig,
 ): Promise<CommandDefinition[]> {
-  logger.info('Registering commands...');
+  logger.verbose('Registering commands...');
   const registeredDefinitions: CommandDefinition[] = [];
 
   // 1. Register built-in commands (Placeholder - uncomment when command packages exist)
@@ -62,29 +69,43 @@ export async function registerAllCommands(
   // logger.warn('Built-in command registration is currently commented out.');
 
   // 2. Discover and register plugin commands
-  const pluginPaths = config.pluginPaths || [];
-  if (pluginPaths.length > 0) {
+  const pluginConfigs: PluginConfig[] = config.plugins || [];
+  if (pluginConfigs.length > 0) {
     logger.verbose(
-      `Attempting to load command plugins from: ${pluginPaths.join(', ')}`,
+      `Attempting to load command plugins from: ${pluginConfigs.map((p) => p.name).join(', ')}`,
     );
-    const loadedPlugins: CommandPlugin[] =
-      await loadCommandPlugins(pluginPaths);
+    const loadedPlugins: LoadedCommandPlugin[] =
+      await loadCommandPlugins(pluginConfigs);
 
+    let pluginTree: Record<string, any> = {};
     loadedPlugins.forEach((plugin) => {
       if (plugin.type === 'command' && plugin.commands) {
-        logger.info(`Registering commands from plugin...`); // TODO: identify plugin source
-        plugin.commands.forEach((cmdDef: CommandDefinition) => {
-          const commandName = constructCommandName(cmdDef.packageName!, cmdDef.name);
-          logger.verbose(`Registering command: ${commandName}`);
+        plugin.commands.forEach((cmdDef: CommandDefinition, index: number) => {
+          const commandName = constructCommandName(
+            cmdDef.packageName!,
+            cmdDef.name,
+          );
           const registeredDef = addCommandToProgram(program, cmdDef);
           registeredDefinitions.push(registeredDef);
+          pluginTree[cmdDef.packageName!] ??= [];
+          pluginTree[cmdDef.packageName!].push(cmdDef.name);
         });
       }
     });
+    const table = new Table({
+      head: ['Plugin', 'Commands'],
+      style: {
+        head: ['green'],
+      },
+    });
+    for (const plugin in pluginTree) {
+      table.push([plugin, pluginTree[plugin].join(', ')]);
+    }
+    logger.verbose(`Plugin tree: \n${table.toString()}`);
   } else {
     logger.verbose('No external command plugins specified to load.');
   }
 
-  logger.info('Command registration complete.');
+  logger.verbose('Command registration complete.');
   return registeredDefinitions; // Return the collected definitions
 }

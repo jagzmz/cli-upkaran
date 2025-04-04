@@ -15,25 +15,30 @@ export function setVerbose(verbose: boolean) {
   isVerbose = verbose;
 }
 
+const successColor = '#00FF00';
+const warnColor = '#FFFF00';
+const errorColor = '#FF0000';
+const infoColor = '#0000FF';
+
 export const logger = {
   /** Log informational messages. */
   info: (...args: any[]) => {
-    console.log(chalkInstance.blue('INFO:'), ...args);
+    console.log(chalkInstance.bold.hex(infoColor)('INFO:'), ...args);
   },
 
   /** Log success messages. */
   success: (...args: any[]) => {
-    console.log(chalkInstance.green('SUCCESS:'), ...args);
+    console.log(chalkInstance.bold.hex(successColor)('SUCCESS:'), ...args);
   },
 
   /** Log warning messages. */
   warn: (...args: any[]) => {
-    console.warn(chalkInstance.yellow('WARN:'), ...args);
+    console.warn(chalkInstance.bold.hex(warnColor)('WARN:'), ...args);
   },
 
   /** Log error messages. */
   error: (...args: any[]) => {
-    console.error(chalkInstance.red('ERROR:'), ...args);
+    console.error(chalkInstance.bold.hex(errorColor)('ERROR:'), ...args);
   },
 
   /** Log verbose messages, only shown if verbose mode is enabled. */

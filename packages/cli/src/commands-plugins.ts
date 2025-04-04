@@ -1,9 +1,9 @@
 import { Command, Argument, Option } from 'commander';
 import {
     logger,
-    getRegisteredPlugins,
-    addPluginToRegistry,
-    removePluginFromRegistry,
+    getGlobalConfig,
+    addPluginToGlobalConfig,
+    removePluginFromGlobalConfig,
 } from '@cli-upkaran/core';
 import { createRequire } from 'node:module';
 import { exec } from 'node:child_process';
@@ -27,11 +27,11 @@ export function registerPluginCommands(program: Command) {
         .action(async () => {
             logger.info('Listing registered plugins:');
             try {
-                const plugins = await getRegisteredPlugins();
-                if (plugins.length === 0) {
+                const plugins = getGlobalConfig().plugins;
+                if (plugins?.length === 0) {
                     logger.info('(No plugins registered)');
                 } else {
-                    plugins.forEach(p => console.log(p)); // Directly print for clean list
+                    plugins?.forEach(p => console.log(p)); // Directly print for clean list
                 }
             } catch (error) {
                 logger.error('Failed to list plugins:', error);
@@ -96,8 +96,10 @@ ${installError.stderr}`);
                     }
                 }
 
+                const resolvedPath = require.resolve(nameOrPath);
+
                 // 3. Add to registry (only happens if resolved initially or installed successfully)
-                const added = await addPluginToRegistry(nameOrPath);
+                const added = await addPluginToGlobalConfig({ name: nameOrPath, path: resolvedPath, options: {} });
                 if (!added) {
                     logger.warn(`Plugin '${nameOrPath}' is already registered.`);
                 }
@@ -118,7 +120,7 @@ ${installError.stderr}`);
                 if (!nameOrPath || typeof nameOrPath !== 'string') {
                     throw new Error('Invalid plugin name or path provided.');
                 }
-                const removed = await removePluginFromRegistry(nameOrPath);
+                const removed = await removePluginFromGlobalConfig(nameOrPath);
                 if (!removed) {
                     logger.warn(`Plugin '${nameOrPath}' was not found in the registry.`);
                 }

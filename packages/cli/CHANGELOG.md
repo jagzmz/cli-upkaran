@@ -1,5 +1,11 @@
 # @cli-upkaran/cli
 
+## 0.0.2-beta.4
+
+### Patch Changes
+
+- 9187068: fix: correct duplicate argument in installPluginGlobally call
+
 ## 0.0.2-beta.3
 
 ### Patch Changes

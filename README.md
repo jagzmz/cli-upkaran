@@ -146,7 +146,7 @@ Creating your own commands for `cli-upkaran` involves creating a Node.js package
     cli-upkaran your-local-plugin:my-command 
     ```
 
-*Refer to the `@cli-upkaran/command-digest` or `@cli-upkaran/command-fetch` packages within this repository for concrete examples.*
+*Refer to the `@cli-upkaran/digest` or `@cli-upkaran/fetch` packages within this repository for concrete examples.*
 
 ## Contributing
 

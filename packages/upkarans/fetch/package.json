@@ -1,5 +1,5 @@
 {
-  "name": "@cli-upkaran/command-fetch",
+  "name": "@cli-upkaran/fetch",
   "version": "0.0.1",
   "description": "The 'fetch' command implementation for cli-upkaran",
   "main": "dist/index.js",

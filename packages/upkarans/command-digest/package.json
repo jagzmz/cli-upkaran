@@ -1,5 +1,5 @@
 {
-  "name": "@cli-upkaran/command-digest",
+  "name": "@cli-upkaran/digest",
   "version": "0.0.1",
   "description": "The 'digest' command implementation for cli-upkaran",
   "main": "dist/index.js",

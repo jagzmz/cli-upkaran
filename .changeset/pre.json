@@ -1,6 +1,6 @@
 {
   "mode": "pre",
-  "tag": "beta",
+  "tag": "latest",
   "initialVersions": {
     "@cli-upkaran/adapter-filesystem": "0.0.1",
     "@cli-upkaran/adapter-website": "0.0.1",

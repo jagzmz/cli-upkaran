@@ -34,9 +34,8 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
-      # Optional: Build step if needed before publishing
-      # - name: Build Packages
-      #   run: pnpm run build
+      - name: Build Packages
+        run: pnpm run build
 
       - name: Create Release Pull Request or Publish to npm
         id: changesets

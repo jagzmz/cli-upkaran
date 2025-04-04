@@ -73,7 +73,7 @@ export async function runFetch(
       {
         adapterOptions,
         formatterOptions,
-        transformContext: { flags: options },
+        transformContext: { flags: options as any },
       },
     );
 

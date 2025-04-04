@@ -98,7 +98,7 @@ export async function runDigest(
       {
         adapterOptions,
         formatterOptions,
-        transformContext: { flags: options }, // Pass command flags as context
+        transformContext: { flags: options as any }, // Pass command flags as context
       },
     );
 

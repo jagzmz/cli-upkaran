@@ -2,19 +2,13 @@ import type { Command } from 'commander';
 import {
   logger,
   loadCommandPlugins,
-  type CommandPlugin,
   type CommandDefinition,
   type GlobalConfig,
-  printTree,
   type PluginConfig,
   type LoadedCommandPlugin,
 } from '@cli-upkaran/core';
 import Table from 'cli-table3';
 
-// --- Import built-in command registration functions --- S
-// These imports will likely cause dependency cycles if commands depend on CLI UI.
-// Consider a different registration pattern if needed, e.g., commands register themselves.
-import { registerDigestCommand } from '@cli-upkaran/command-digest';
 import { constructCommandName } from './utils/index.js';
 
 /**

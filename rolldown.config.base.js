@@ -17,8 +17,14 @@ const __dirname = path.dirname(__filename);
  * @returns {import('rolldown').RolldownOptions}
  */
 export function createConfig(options) {
-  const { packageDir, input = 'src/index.ts', external = [] } = options;
-  const packagePath = path.resolve(__dirname, packageDir);
+  const { packageDir, input = 'src/index.ts', external = [] } = options || {};
+  let finalPackageDir;
+  if (packageDir) {
+    finalPackageDir = packageDir;
+  } else {
+    finalPackageDir = resolvePackageDir();
+  }
+  const packagePath = path.resolve(__dirname, finalPackageDir);
   const pkg = JSON.parse(
     fs.readFileSync(path.join(packagePath, 'package.json'), 'utf-8'),
   );
@@ -71,4 +77,18 @@ export function createConfig(options) {
     // Plugins would go here if we add them later
     // plugins: [],
   });
+}
+
+
+function resolvePackageDir() {
+  const callerFile = new Error().stack
+    .split('\n')
+    .find(line => line.includes('file://') && !line.includes('rolldown.config.base.js'))
+    ?.match(/file:\/\/(.+?):[0-9]+:[0-9]+/)?.[1];
+
+  if (!callerFile) {
+    throw new Error('Could not determine caller file');
+  }
+
+  return path.dirname(callerFile);
 }

@@ -1,5 +1,5 @@
 {
-  "name": "@cli-upkaran/root",
+  "name": "cli-upkaran-root",
   "private": true,
   "version": "0.0.1",
   "description": "Monorepo root for the cli-upkaran toolkit",
@@ -15,8 +15,7 @@
     "clean": "pnpm -r run clean && rm -rf node_modules",
     "prepare": "husky install",
     "version:ci": "changeset version",
-    "release:publish": "node ./.github/scripts/publish-with-tag.js",
-    "changeset:from-commit": "tsx scripts/generate-changeset-from-commit.ts"
+    "release:publish": "node ./.github/scripts/publish-with-tag.js"
   },
   "keywords": [
     "ai",
@@ -25,7 +24,7 @@
     "llm",
     "developer-tools"
   ],
-  "author": "Mahesh Jaganiya <jagzmz@gmail.com>",
+  "author": "Your Name <your.email@example.com>",
   "license": "MIT",
   "devDependencies": {
     "@changesets/cli": "^2.28.1",
@@ -44,7 +43,6 @@
     "rolldown": "1.0.0-beta.7",
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
-    "tsx": "^4.19.3",
     "typescript": "^5.5.3"
   },
   "packageManager": "pnpm@9.0.2"

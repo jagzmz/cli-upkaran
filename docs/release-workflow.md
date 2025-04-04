@@ -23,7 +23,7 @@ This document outlines the versioning, changelog generation, and release process
 
 ## Day-to-Day Development Workflow (with Automated Summary)
 
-This is the standard process for contributing code that should be included in a future release. It leverages a script to generate the changeset summary from your commit message *after* the initial code commit.
+This is the standard process for contributing code that should be included in a future release. It leverages a Git hook (`prepare-commit-msg`) to automatically populate the changeset summary from your commit message.
 
 1.  **Branch:** Create a feature branch from the latest `main`:
     ```bash
@@ -32,32 +32,37 @@ This is the standard process for contributing code that should be included in a 
     git checkout -b feat/my-new-feature
     ```
 2.  **Code:** Make your code changes across one or more packages.
-3.  **Stage Code Changes:** Add **only** your modified code files:
+3.  **Stage Code Changes:** Add your modified code files:
     ```bash
     git add src/ my-code.ts
     ```
-4.  **Commit Code with Detailed Message:** Run `git commit`. Your configured Git editor will open.
-    *   Write a clear and descriptive commit message. Following Conventional Commits format (`feat:`, `fix:`, etc.) is **highly recommended** as the script uses the type to infer the version bump (`feat` -> minor, `fix` -> patch).
-    *   The commit message subject and body will be used for the changeset summary.
-    *   Save and close the editor.
-    *   This commit now contains **only your code changes**.
-
-5.  **Generate Changeset & Amend Commit:** Run the helper script:
+4.  **Create Changeset (Summary Optional):** Run the Changesets CLI tool:
     ```bash
-    pnpm run changeset:from-commit
+    pnpm changeset add
+    # Or just: pnpm changeset
     ```
-    *   **Automatic Actions:**
-        *   The script (`scripts/generate-changeset-from-commit.ts`) reads your **last commit** (HEAD).
-        *   It determines which packages were changed in that commit.
-        *   It infers the SemVer bump type (patch/minor/major) based on the commit message type (e.g., `fix` -> `patch`, `feat` -> `minor`). Defaults to `patch` if type is unknown.
-        *   It creates a new `.changeset/*.md` file.
-        *   It populates the summary in the changeset file using your commit message subject and body.
-        *   It stages this new changeset file (`git add .changeset/*.md`).
-        *   It runs `git commit --amend --no-edit` to automatically merge the staged changeset file into your previous commit without changing the commit message.
-
-6.  **Final State:** You now have a single commit in your history that contains both your code changes and the corresponding, automatically generated changeset file.
-
-7.  **Push & PR:** Push your branch (you might need to force push, `git push --force-with-lease`, if you had already pushed the initial commit before amending) and create a Pull Request targeting `main`.
+    *   The tool will detect the packages changed compared to `main`.
+    *   Follow the prompts:
+        *   Select the package(s) affected by your change using the spacebar and arrow keys.
+        *   Choose the appropriate SemVer bump type (`patch`, `minor`, `major`) for **each** selected package based on the changes made.
+        *   When prompted for a summary, you can just **press Enter to leave it blank**. The Git hook will populate it later.
+    *   This creates a new file like `.changeset/random-name.md` with an empty summary section after the `---`.
+5.  **Stage Changeset File:** Add the newly created **empty** changeset file:
+    ```bash
+    git add .changeset/random-name.md
+    ```
+6.  **Commit with Detailed Message:** Run `git commit`. Your configured Git editor will open.
+    *   Write a clear and descriptive commit message. Following Conventional Commits format is recommended (e.g., `feat(scope): subject\n\nbody`). The subject line and body (if provided) will be used for the changeset summary.
+    *   Save and close the editor.
+7.  **Hook Execution (Automatic):**
+    *   The `prepare-commit-msg` Git hook (configured via Husky) triggers automatically.
+    *   It runs the script `.github/scripts/prepare-changeset-summary.js`.
+    *   The script reads the commit message you just wrote.
+    *   It finds the staged `.changeset/*.md` file.
+    *   It writes your commit message subject and body into the summary section of the changeset file.
+    *   It re-stages (`git add`) the updated changeset file.
+8.  **Commit Finalized:** The `git commit` process completes, now including the changeset file with the summary automatically populated from your commit message.
+9.  **Push & PR:** Push your branch and create a Pull Request targeting `main`.
 
 ## Automated Release Process (Stable)
 
@@ -126,5 +131,4 @@ Use this workflow when you want to publish experimental versions before a final 
 *   **NPM Token:** The automated publishing requires an `NPM_TOKEN` secret to be configured in the GitHub repository settings (Settings > Secrets and variables > Actions). Without it, the `release.yml` action will create Pull Requests instead of publishing.
 *   **`publish-with-tag.js`:** This script is essential for ensuring pre-releases are published with the correct npm dist-tag.
 *   **Manual Steps:** Entering and exiting pre-release mode (`pnpm changeset pre enter/exit`) are manual steps that need to be committed.
-*   **Build Step:** If your packages need to be built *before* publishing, uncomment and adjust the build step in `release.yml`.
-*   **Amending Commits:** The `changeset:from-commit` script uses `git commit --amend`. If you have already pushed the initial code commit to your feature branch remote, you will need to force push (`git push --force-with-lease origin your-branch`) after running the script to update the remote branch history. 
+*   **Build Step:** If your packages need to be built *before* publishing, uncomment and adjust the build step in `release.yml`. 

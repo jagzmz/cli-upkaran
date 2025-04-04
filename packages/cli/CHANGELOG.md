@@ -1,5 +1,11 @@
 # @cli-upkaran/cli
 
+## 0.0.2-beta.2
+
+### Patch Changes
+
+- c71578e: fix issue with resolving packages which had version tag
+
 ## 0.0.2-beta.1
 
 ### Patch Changes

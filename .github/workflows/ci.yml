@@ -1,0 +1,46 @@
+# .github/workflows/ci.yml
+name: CI Checks
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check-build:
+    name: Check Lint/Test/Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest # Or pin to a specific pnpm version
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Or your desired Node.js version
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint Check
+        run: pnpm run lint # Assuming you have a lint script
+
+      - name: Test Check
+        run: pnpm run test # Assuming you have a test script
+
+      - name: Build Check
+        run: pnpm run build # Assuming you have a build script 

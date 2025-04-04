@@ -1,0 +1,61 @@
+# .github/workflows/release.yml
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false # Allow releases to complete
+
+jobs:
+  release:
+    name: Create Release PR or Publish
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        # Fetch history and tags for version calculation
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Optional: Build step if needed before publishing
+      # - name: Build Packages
+      #   run: pnpm run build
+
+      - name: Create Release Pull Request or Publish to npm
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          # Optional: Specify publish script if it's not just `pnpm publish`
+          # publish: pnpm run release:publish
+          version: pnpm run version:ci # Script to bump versions and update changelogs
+          commit: "chore: update versions and changelogs for release" # Commit message for version bumps
+          title: "chore: prepare release" # PR title
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # You MUST create an NPM_TOKEN secret in your repo settings
+          # Go to Repo Settings > Secrets and variables > Actions > New repository secret
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # Optional: Step to check if packages were published
+      # - name: Check Publish Status
+      #   if: steps.changesets.outputs.published == 'true'
+      #   run: echo "Successfully published packages: ${{ steps.changesets.outputs.publishedPackages }}" 

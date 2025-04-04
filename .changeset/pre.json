@@ -1,5 +1,5 @@
 {
-  "mode": "pre",
+  "mode": "exit",
   "tag": "latest",
   "initialVersions": {
     "@cli-upkaran/adapter-filesystem": "0.0.1",

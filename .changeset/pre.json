@@ -11,6 +11,7 @@
     "@cli-upkaran/fetch": "0.0.1"
   },
   "changesets": [
+    "cuddly-jokes-unite",
     "full-boats-behave",
     "ripe-dodos-give",
     "ripe-eagles-notice",

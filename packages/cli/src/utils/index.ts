@@ -69,35 +69,35 @@ export async function checkNpmAvailability(
  * Returns true on success, false on failure.
  */
 export async function installPluginGlobally(
-  packageName: string,
+  installSpec: string, // e.g., name@version
+  baseName: string, // e.g., name
 ): Promise<boolean> {
-  logger.info(`Attempting to install '${packageName}' globally via npm...`);
+  logger.info(`Attempting to install '${installSpec}' globally via npm...`);
   try {
-    const installCommand = `npm install -g ${packageName}`;
+    const installCommand = `npm install -g ${installSpec}`;
     logger.verbose(`Executing: ${installCommand}`);
     const { stderr } = await execPromise(installCommand);
     if (stderr) {
-      // Often npm install -g shows warnings on stderr even on success
       logger.warn(
-        `Installation output (stderr) for ${packageName}:\n${stderr}`,
+        `Installation output (stderr) for ${installSpec}:\n${stderr}`,
       );
     }
-    // Consider stdout less critical unless debugging
-    // logger.verbose(`Installation output (stdout) for ${packageName}:\n${stdout}`);
-    logger.success(`Installation command for '${packageName}' finished.`);
-    // Verify installation by resolving again
-    if (checkLocalPlugin(packageName)) {
-      logger.success(`Successfully installed and verified '${packageName}'.`);
+    logger.success(`Installation command for '${installSpec}' finished.`);
+
+    // Verify installation by resolving the BASE NAME again
+    if (checkLocalPlugin(baseName)) {
+      logger.success(`Successfully installed and verified '${baseName}'.`);
       return true;
     } else {
+      // This error is more accurate now
       logger.error(
-        `Installation command ran for '${packageName}', but package still not resolvable.`,
+        `Installation command ran for '${installSpec}', but base package '${baseName}' still not resolvable.`,
       );
       return false;
     }
   } catch (installError: any) {
     logger.error(
-      `Failed to automatically install '${packageName}':`,
+      `Failed to automatically install '${installSpec}':`,
       installError.message || installError,
     );
     return false;

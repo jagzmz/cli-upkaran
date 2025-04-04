@@ -113,7 +113,11 @@ export function registerPluginCommands(program: Command) {
             logger.warn(`Plugin '${packageName}' not found locally.`);
             if (options.install) {
               // Use the potentially versioned spec for installation
-              const installSuccess = await installPluginGlobally(installSpec);
+              // AND pass the base name for verification
+              const installSuccess = await installPluginGlobally(
+                installSpec,
+                packageName,
+              );
               if (!installSuccess) {
                 logger.error(
                   `Failed to automatically install '${installSpec}'. Exiting.`,

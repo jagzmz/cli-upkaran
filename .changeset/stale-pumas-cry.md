@@ -7,3 +7,6 @@
 '@cli-upkaran/digest': patch
 '@cli-upkaran/fetch': patch
 ---
+chore: update changeset summary for package updates
+
+- Revised the changeset summary to reflect recent updates across multiple packages, ensuring accurate documentation of changes.

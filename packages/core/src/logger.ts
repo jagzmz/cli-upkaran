@@ -1,4 +1,4 @@
-import chalk, { Chalk } from 'chalk';
+import { Chalk } from 'chalk';
 
 // Basic logger implementation. Can be enhanced later with levels, transports, etc.
 

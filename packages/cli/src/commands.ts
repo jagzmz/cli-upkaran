@@ -19,7 +19,7 @@ function addCommandToProgram(
   program: Command,
   def: CommandDefinition,
 ): CommandDefinition {
-  const commandName = constructCommandName(def.packageName!, def.name);
+  const commandName = constructCommandName(def.packageName, def.name);
   const cmd = program.command(commandName);
   if (def.description) cmd.description(def.description);
   if (def.aliases) cmd.aliases(def.aliases);
@@ -74,15 +74,15 @@ export async function registerAllCommands(
     const pluginTree: Record<string, any> = {};
     loadedPlugins.forEach((plugin) => {
       if (plugin.type === 'command' && plugin.commands) {
-        plugin.commands.forEach((cmdDef: CommandDefinition, index: number) => {
-          const commandName = constructCommandName(
-            cmdDef.packageName!,
-            cmdDef.name,
-          );
+        plugin.commands.forEach((cmdDef: CommandDefinition, _index: number) => {
+          // const commandName = constructCommandName(
+          //   cmdDef.packageName,
+          //   cmdDef.name,
+          // );
           const registeredDef = addCommandToProgram(program, cmdDef);
           registeredDefinitions.push(registeredDef);
-          pluginTree[cmdDef.packageName!] ??= [];
-          pluginTree[cmdDef.packageName!].push(cmdDef.name);
+          pluginTree[cmdDef.packageName ?? 'unknown-package'] ??= [];
+          pluginTree[cmdDef.packageName ?? 'unknown-package'].push(cmdDef.name);
         });
       }
     });

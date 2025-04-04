@@ -5,7 +5,8 @@ module.exports = {
   parser: '@typescript-eslint/parser',
   plugins: [
     '@typescript-eslint', // Use TypeScript specific rules
-    'prettier', // Runs Prettier as an ESLint rule
+    'prettier', // Runs Prettier as an ESLint rule,
+    'unused-imports'
   ],
   extends: [
     'eslint:recommended', // Base ESLint recommendations
@@ -52,9 +53,11 @@ module.exports = {
     'no-unused-vars': 'off', // Disable base rule, use TypeScript version
     'no-redeclare': 'off', // Disable base rule, use TypeScript version
 
+    "unused-imports/no-unused-imports": "warn",
+
     // --- TypeScript Specific Rules ---
     '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }], // Warn about unused vars, allow underscore prefix
-    '@typescript-eslint/no-explicit-any': 'warn', // Warn instead of error for 'any'
+    '@typescript-eslint/no-explicit-any': 'off', // Allow 'any' type
     '@typescript-eslint/explicit-module-boundary-types': 'off', // Optional: enforce return types
     '@typescript-eslint/no-redeclare': ['error'], // Prevent redeclaring variables
     '@typescript-eslint/no-non-null-assertion': 'warn', // Be careful with `!` non-null assertions

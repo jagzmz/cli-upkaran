@@ -6,7 +6,7 @@ import type { ContentItem } from './content-item.js';
  */
 export interface TransformContext {
   // Example: Global settings relevant to transformations
-  flags?: Record<string, any>;
+  flags?: Record<string, unknown>;
   // Add other context properties as needed
 }
 

@@ -1,14 +1,12 @@
 import path from 'node:path';
-import { createWriteStream, promises as fs } from 'node:fs';
+import { createWriteStream } from 'node:fs';
 import { logger, DataPrepError } from '@cli-upkaran/core';
 import {
   runPipeline,
-  createIgnoreFilter,
   readIgnoreFile,
   type AdapterOptions,
   type FormatterOptions,
   type Transformer,
-  type ContentItem,
   defaultFormatters,
   // TODO: Import specific formatters when they exist
   // import { createMarkdownFormatter, createJsonFormatter } from '../formatters';

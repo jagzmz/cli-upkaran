@@ -230,7 +230,10 @@ class WebsiteAdapter implements Adapter {
 
       // Yield all items currently in the buffer
       while (resultsBuffer.length > 0) {
-        yield resultsBuffer.shift()!;
+        const item = resultsBuffer.shift();
+        if (item) {
+          yield item;
+        }
       }
       // If buffer is empty but queue is still processing, wait briefly
       if (resultsBuffer.length === 0 && (queue.size > 0 || queue.pending > 0)) {

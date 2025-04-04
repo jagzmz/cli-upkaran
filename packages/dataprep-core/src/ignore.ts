@@ -1,6 +1,5 @@
 import micromatch from 'micromatch';
 import { promises as fs } from 'node:fs';
-import path from 'node:path';
 import { logger } from '@cli-upkaran/core';
 import ignore from 'ignore';
 import type { Ignore } from 'ignore';
@@ -51,8 +50,8 @@ export async function readIgnoreFile(filePath: string): Promise<string[]> {
       .split(/\r?\n/) // Split by newline, handling Windows endings
       .map((line) => line.trim())
       .filter((line) => line !== '' && !line.startsWith('#'));
-  } catch (error: any) {
-    if (error.code === 'ENOENT') {
+  } catch (error: unknown) {
+    if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
       logger.verbose(`Ignore file not found: ${filePath}`);
       return []; // File not found is not an error in this context
     } else {
@@ -80,7 +79,7 @@ export function createInclusionChecker(
 ): (relativePath: string) => boolean {
   const activeFilters = Object.entries(filters)
     .filter(([, ig]) => ig)
-    .map(([key, ig]) => ({ key, ig: ig! }));
+    .map(([key, ig]) => ({ key, ig: ig }));
   const hasMatchPatterns = matchPatterns && matchPatterns.length > 0;
   const hasExcludePatterns = excludePatterns && excludePatterns.length > 0;
 
@@ -92,7 +91,7 @@ export function createInclusionChecker(
   activeFilters.forEach((f) => logger.verbose(` - Ignore filter: ${f.key}`));
 
   return (relativePath: string): boolean => {
-    const absolutePath = path.join(baseDir, relativePath);
+    // const absolutePath = path.join(baseDir, relativePath);
 
     // 1. Check explicit exclude patterns first
     if (
@@ -105,6 +104,10 @@ export function createInclusionChecker(
 
     // 2. Check ignore filters
     for (const { key, ig } of activeFilters) {
+      if (!ig) {
+        logger.warn(`Ignore filter [${key}] is not initialized`);
+        continue;
+      }
       if (ig.ignores(relativePath)) {
         logger.verbose(`Path ignored by filter [${key}]: ${relativePath}`);
         return false;

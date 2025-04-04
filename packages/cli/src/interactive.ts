@@ -184,7 +184,7 @@ export async function runInteractive(
     // Find the original definition from the list we already have
     const originalDefinition = availableCommands.find(
       (def) =>
-        constructCommandName(def.packageName!, def.name) ===
+        constructCommandName(def.packageName ?? 'unknown-package', def.name) ===
         selectedCommandName,
     );
     if (originalDefinition?.handler) {
@@ -227,13 +227,13 @@ export async function runInteractive(
         `${selectedCommandName} completed (via fallback execution).`,
       );
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     spinner.fail(`${selectedCommandName} failed.`);
     logger.error(
       `Error during interactive execution of ${selectedCommandName}:`,
-      error.message,
+      error instanceof Error ? error.message : String(error),
     );
-    logger.verbose(error.stack);
+    logger.verbose(error instanceof Error ? error.stack : String(error));
     // Let the main error handler in index.ts catch and exit
     throw error;
   }

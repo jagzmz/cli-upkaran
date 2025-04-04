@@ -6,7 +6,6 @@ import {
   type FormatterOptions,
   type Transformer,
   type Formatter,
-  type ContentItem,
   defaultFormatters,
 } from '@cli-upkaran/dataprep-core';
 import { createWebsiteAdapter } from '@cli-upkaran/adapter-website'; // Assuming adapter provides this factory

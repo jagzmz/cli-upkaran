@@ -8,7 +8,11 @@ import { logger } from '@cli-upkaran/core'; // Import logger
 const require = createRequire(import.meta.url);
 const execPromise = util.promisify(exec);
 
-export function constructCommandName(packageName: string, commandName: string) {
+export function constructCommandName(
+  packageName?: string,
+  commandName?: string,
+) {
+  packageName = packageName ?? 'unknown-package';
   return `${packageName}:${commandName}`;
 }
 
@@ -71,7 +75,7 @@ export async function installPluginGlobally(
   try {
     const installCommand = `npm install -g ${packageName}`;
     logger.verbose(`Executing: ${installCommand}`);
-    const { stdout, stderr } = await execPromise(installCommand);
+    const { stderr } = await execPromise(installCommand);
     if (stderr) {
       // Often npm install -g shows warnings on stderr even on success
       logger.warn(

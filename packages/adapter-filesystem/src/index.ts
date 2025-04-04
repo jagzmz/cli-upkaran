@@ -8,7 +8,6 @@ import {
   type AdapterOptions,
   type ContentItem,
   createIgnoreFilter,
-  readIgnoreFile,
 } from '@cli-upkaran/dataprep-core';
 import { getFileMetadata } from './utils.js';
 

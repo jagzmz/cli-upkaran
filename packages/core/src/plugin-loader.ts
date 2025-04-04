@@ -1,6 +1,5 @@
 import path from 'node:path';
 import { createRequire } from 'node:module';
-import { fileURLToPath } from 'node:url';
 import { logger } from './logger.js'; // Use .js extension for ESM compatibility
 import type {
   PluginConfig,
@@ -43,7 +42,7 @@ function tryResolvePluginPath(config: PluginConfig): string | null {
   try {
     if (
       path.isAbsolute(registeredPath) ||
-      !registeredPath.match(/^\.\.?[\\\/]/)
+      !registeredPath.match(/^\.\.?[\\/]/)
     ) {
       // Absolute path or potential package name (might be same as name, but try again)
       resolvedPath = require.resolve(registeredPath);

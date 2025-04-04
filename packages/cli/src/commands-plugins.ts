@@ -9,7 +9,6 @@ import {
 import { createRequire } from 'node:module';
 import { exec } from 'node:child_process';
 import util from 'node:util';
-import readline from 'node:readline/promises';
 // Import askConfirmation from utils
 import { askConfirmation } from './utils/index.js';
 
@@ -82,7 +81,7 @@ export function registerPluginCommands(program: Command) {
               try {
                 const installCommand = `npm install -g ${nameOrPath}`;
                 logger.verbose(`Executing: ${installCommand}`);
-                const { stdout, stderr } = await execPromise(installCommand);
+                const { stderr } = await execPromise(installCommand);
                 if (stderr) {
                   logger.warn(
                     `Installation warnings for ${nameOrPath}:\n${stderr}`,

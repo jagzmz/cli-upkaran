@@ -35,6 +35,9 @@ importers:
       eslint-plugin-prettier:
         specifier: ^5.2.1
         version: 5.2.6(eslint-config-prettier@9.1.0(eslint@8.57.1))(eslint@8.57.1)(prettier@3.5.3)
+      eslint-plugin-unused-imports:
+        specifier: ^4.1.4
+        version: 4.1.4(@typescript-eslint/eslint-plugin@7.18.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.8.2))(eslint@8.57.1)(typescript@5.8.2))(eslint@8.57.1)
       husky:
         specifier: ^9.0.11
         version: 9.1.7
@@ -1661,6 +1664,15 @@ packages:
       '@types/eslint':
         optional: true
       eslint-config-prettier:
+        optional: true
+
+  eslint-plugin-unused-imports@4.1.4:
+    resolution: {integrity: sha512-YptD6IzQjDardkl0POxnnRBhU1OEePMV0nd6siHaRBbd+lyh6NAhFEobiznKU7kTsSsDeSD62Pe7kAM1b7dAZQ==}
+    peerDependencies:
+      '@typescript-eslint/eslint-plugin': ^8.0.0-0 || ^7.0.0 || ^6.0.0 || ^5.0.0
+      eslint: ^9.0.0 || ^8.0.0
+    peerDependenciesMeta:
+      '@typescript-eslint/eslint-plugin':
         optional: true
 
   eslint-scope@7.2.2:
@@ -4981,6 +4993,12 @@ snapshots:
       synckit: 0.11.1
     optionalDependencies:
       eslint-config-prettier: 9.1.0(eslint@8.57.1)
+
+  eslint-plugin-unused-imports@4.1.4(@typescript-eslint/eslint-plugin@7.18.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.8.2))(eslint@8.57.1)(typescript@5.8.2))(eslint@8.57.1):
+    dependencies:
+      eslint: 8.57.1
+    optionalDependencies:
+      '@typescript-eslint/eslint-plugin': 7.18.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.8.2))(eslint@8.57.1)(typescript@5.8.2)
 
   eslint-scope@7.2.2:
     dependencies:

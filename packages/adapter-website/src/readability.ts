@@ -1,7 +1,7 @@
 import { Readability } from '@mozilla/readability';
 import { JSDOM } from 'jsdom';
 import TurndownService from 'turndown';
-// @ts-ignore
+// @ts-expect-error - TODO: fix types
 import { gfm } from 'turndown-plugin-gfm';
 import * as cheerio from 'cheerio';
 import { logger } from '@cli-upkaran/core';

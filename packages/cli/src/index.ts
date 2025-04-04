@@ -14,9 +14,6 @@ import {
   addPluginToGlobalConfig,
 } from '@cli-upkaran/core';
 import { createRequire } from 'node:module';
-import { exec } from 'node:child_process';
-import util from 'node:util';
-import readline from 'node:readline/promises';
 // Import helpers from utils
 import {
   askConfirmation,

@@ -43,7 +43,7 @@ export const defaultFormatters = {
     format: async (
       items: AsyncIterable<ContentItem>,
       outputStream: Writable,
-      options?: FormatterOptions,
+      _options?: FormatterOptions,
     ) => {
       for await (const item of items) {
         outputStream.write(JSON.stringify(item) + '\n');
@@ -55,7 +55,7 @@ export const defaultFormatters = {
     format: async (
       items: AsyncIterable<ContentItem>,
       outputStream: Writable,
-      options?: FormatterOptions,
+      _options?: FormatterOptions,
     ) => {
       for await (const item of items) {
         let content;
@@ -82,7 +82,7 @@ export const defaultFormatters = {
     format: async (
       items: AsyncIterable<ContentItem>,
       outputStream: Writable,
-      options?: FormatterOptions,
+      _options?: FormatterOptions,
     ) => {
       for await (const item of items) {
         let content;

@@ -55,6 +55,7 @@ export async function runPipeline(
       options.transformContext || {},
     );
 
+    // eslint-disable-next-line no-inner-declarations
     async function* transformedStreamWrapper() {
       for await (const item of transformedStream) {
         itemCount++;
@@ -83,16 +84,20 @@ export async function runPipeline(
     );
 
     return { itemCount, errorCount };
-  } catch (error: any) {
-    const pipelineError = new DataPrepError(
-      `Pipeline execution failed: ${error.message}`,
-      error,
-    );
-    logger.error(pipelineError.message);
-    if (error.stack) {
-      logger.verbose(error.stack);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      const pipelineError = new DataPrepError(
+        `Pipeline execution failed: ${error.message}`,
+        error,
+      );
+      logger.error(pipelineError.message);
+      if (error.stack) {
+        logger.verbose(error.stack);
+      }
+      throw pipelineError; // Re-throw the structured error
+    } else {
+      throw error; // Re-throw the original error if it's not an instance of Error
     }
-    throw pipelineError; // Re-throw the structured error
   }
 }
 
@@ -130,17 +135,19 @@ async function* applyTransformers(
           );
           break;
         }
-      } catch (err: any) {
-        logger.warn(
-          `Transformer ${transformer.name} failed for item ${item.id}: ${err.message}`,
-        );
-        logger.verbose(err.stack);
-        // Attach error to the item for potential downstream handling or reporting
-        if (currentItem) {
-          currentItem.error = new DataPrepError(
-            `Transformer ${transformer.name} failed`,
-            err,
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          logger.warn(
+            `Transformer ${transformer.name} failed for item ${item.id}: ${err.message}`,
           );
+          logger.verbose(err.stack);
+          // Attach error to the item for potential downstream handling or reporting
+          if (currentItem) {
+            currentItem.error = new DataPrepError(
+              `Transformer ${transformer.name} failed`,
+              err,
+            );
+          }
         }
         // Decide if processing should stop for this item upon transformer error
         // currentItem = null; // Uncomment to filter out items that cause transformer errors

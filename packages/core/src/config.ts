@@ -209,7 +209,7 @@ function resolveSinglePlugin(config: PluginConfig): string | null {
     let resolvedByPath: string;
     if (
       path.isAbsolute(registeredPath) ||
-      !registeredPath.match(/^\.\.?[\\\/]/)
+      !registeredPath.match(/^\.\.?[\\/]/)
     ) {
       resolvedByPath = internalRequire.resolve(registeredPath);
       logger.verbose(
@@ -223,8 +223,12 @@ function resolveSinglePlugin(config: PluginConfig): string | null {
       );
     }
     return resolvedByPath;
-  } catch (pathError: any) {
-    if (pathError.code !== 'MODULE_NOT_FOUND') {
+  } catch (pathError: unknown) {
+    if (
+      pathError instanceof Error &&
+      'code' in pathError &&
+      pathError.code !== 'MODULE_NOT_FOUND'
+    ) {
       logger.warn(
         `  [Warn] Unexpected error resolving '${name}' by path '${registeredPath}':`,
         pathError,

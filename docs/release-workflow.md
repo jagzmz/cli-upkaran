@@ -21,9 +21,9 @@ This document outlines the versioning, changelog generation, and release process
 *   **Feature Branches:** All development happens on short-lived feature branches (e.g., `feat/add-widget`, `fix/login-bug`) branched off `main`.
 *   Pull Requests (PRs): Feature branches are merged into `main` via Pull Requests after code review and CI checks pass.
 
-## Day-to-Day Development Workflow
+## Day-to-Day Development Workflow (with Automated Summary)
 
-This is the standard process for contributing code that should be included in a future release:
+This is the standard process for contributing code that should be included in a future release. It leverages a Git hook (`prepare-commit-msg`) to automatically populate the changeset summary from your commit message.
 
 1.  **Branch:** Create a feature branch from the latest `main`:
     ```bash
@@ -32,29 +32,37 @@ This is the standard process for contributing code that should be included in a 
     git checkout -b feat/my-new-feature
     ```
 2.  **Code:** Make your code changes across one or more packages.
-3.  **Stage Changes:** Add your modified files:
+3.  **Stage Code Changes:** Add your modified code files:
     ```bash
-    git add .
+    git add src/ my-code.ts
     ```
-4.  **Create Changeset:** Run the Changesets CLI tool:
+4.  **Create Changeset (Summary Optional):** Run the Changesets CLI tool:
     ```bash
-    pnpm changeset
+    pnpm changeset add
+    # Or just: pnpm changeset
     ```
     *   The tool will detect the packages changed compared to `main`.
     *   Follow the prompts:
         *   Select the package(s) affected by your change using the spacebar and arrow keys.
         *   Choose the appropriate SemVer bump type (`patch`, `minor`, `major`) for **each** selected package based on the changes made.
-        *   Write a concise summary of the changes. **This summary will appear in the CHANGELOG.md file.** Use markdown if needed. Focus on what changed and why from a user's perspective.
-    *   This creates a new file like `.changeset/random-name.md`.
-5.  **Stage Changeset File:** Add the newly created changeset file:
+        *   When prompted for a summary, you can just **press Enter to leave it blank**. The Git hook will populate it later.
+    *   This creates a new file like `.changeset/random-name.md` with an empty summary section after the `---`.
+5.  **Stage Changeset File:** Add the newly created **empty** changeset file:
     ```bash
     git add .changeset/random-name.md
     ```
-6.  **Commit:** Commit your code changes and the changeset file together:
-    ```bash
-    git commit -m "feat(scope): describe your change briefly"
-    ```
-7.  **Push & PR:** Push your branch and create a Pull Request targeting `main`.
+6.  **Commit with Detailed Message:** Run `git commit`. Your configured Git editor will open.
+    *   Write a clear and descriptive commit message. Following Conventional Commits format is recommended (e.g., `feat(scope): subject\n\nbody`). The subject line and body (if provided) will be used for the changeset summary.
+    *   Save and close the editor.
+7.  **Hook Execution (Automatic):**
+    *   The `prepare-commit-msg` Git hook (configured via Husky) triggers automatically.
+    *   It runs the script `.github/scripts/prepare-changeset-summary.js`.
+    *   The script reads the commit message you just wrote.
+    *   It finds the staged `.changeset/*.md` file.
+    *   It writes your commit message subject and body into the summary section of the changeset file.
+    *   It re-stages (`git add`) the updated changeset file.
+8.  **Commit Finalized:** The `git commit` process completes, now including the changeset file with the summary automatically populated from your commit message.
+9.  **Push & PR:** Push your branch and create a Pull Request targeting `main`.
 
 ## Automated Release Process (Stable)
 

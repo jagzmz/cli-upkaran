@@ -7,5 +7,8 @@
 '@cli-upkaran/digest': patch
 '@cli-upkaran/fetch': patch
 ---
+chore: add scripts for automatic changeset summary updates
 
-Auto changeset summarization
+- Introduced a script to automatically update changeset summaries based on commit messages.
+- Added a Husky hook to trigger the script during commit preparation.
+- Created initial changeset files for package updates.

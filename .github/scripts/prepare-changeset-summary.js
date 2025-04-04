@@ -63,7 +63,11 @@ if (!commitSource || commitSource === 'message' || commitSource === 'template' |
 
     // 7. Write the new content back to the changeset file
     fs.writeFileSync(changesetFilePath, newContent, 'utf-8');
-    console.log(`[prepare-changeset] Successfully updated summary in ${changesetFilePath}`);
+    console.log(`[prepare-changeset] Updated summary in ${changesetFilePath}`);
+
+    // 8. **** Re-stage the modified file ****
+    execSync(`git add "${changesetFilePath}"`);
+    console.log(`[prepare-changeset] Re-staged updated file: ${changesetFilePath}`);
 
   } catch (error) {
     console.error('[prepare-changeset] Error:', error);

@@ -7,13 +7,15 @@ import {
   findBrokenPlugins,
 } from '@cli-upkaran/core';
 import { createRequire } from 'node:module';
-import { exec } from 'node:child_process';
-import util from 'node:util';
+// import { exec } from 'node:child_process';
+// import util from 'node:util';
 // Import askConfirmation from utils
 import { askConfirmation } from './utils/index.js';
+// Import helpers from utils
+import { installPluginGlobally } from './utils/index.js';
 
 // Promisify exec for easier async/await usage
-const execPromise = util.promisify(exec);
+// const execPromise = util.promisify(exec);
 
 // Helper to resolve modules relative to this file
 const require = createRequire(import.meta.url);
@@ -49,7 +51,10 @@ export function registerPluginCommands(program: Command) {
       'Register a new plugin package name or path (validates installation)',
     )
     .addArgument(
-      new Argument('<name_or_path>', 'Plugin package name or path to add'),
+      new Argument(
+        '<name_or_path_or_spec>',
+        'Plugin package name[@version], or path to add',
+      ),
     )
     .addOption(
       new Option(
@@ -57,53 +62,83 @@ export function registerPluginCommands(program: Command) {
         'Attempt to automatically install the plugin if not found',
       ).default(false),
     )
-    .action(async (nameOrPath: string, options: { install: boolean }) => {
-      logger.info(`Attempting to add plugin: ${nameOrPath}`);
+    .action(async (nameOrPathOrSpec: string, options: { install: boolean }) => {
+      logger.info(`Attempting to add plugin: ${nameOrPathOrSpec}`);
       let resolvedPath: string | null = null;
+      let packageName = nameOrPathOrSpec;
+      let installSpec = nameOrPathOrSpec;
+
+      // Check if it looks like a package specifier with version/tag
+      const versionSeparatorIndex = nameOrPathOrSpec.lastIndexOf('@');
+      if (versionSeparatorIndex > 0) {
+        // Check if it's likely a scoped package or just a version/tag
+        if (
+          nameOrPathOrSpec.startsWith('@') &&
+          nameOrPathOrSpec.indexOf('/') > 0 &&
+          nameOrPathOrSpec.indexOf('/') < versionSeparatorIndex
+        ) {
+          // Scoped package like @scope/name@version
+          packageName = nameOrPathOrSpec.substring(0, versionSeparatorIndex);
+        } else if (!nameOrPathOrSpec.startsWith('@')) {
+          // Regular package like name@version
+          packageName = nameOrPathOrSpec.substring(0, versionSeparatorIndex);
+        } else {
+          // Could be just a scope @scope/name without version, treat as package name
+          packageName = nameOrPathOrSpec;
+          installSpec = nameOrPathOrSpec; // Install the name directly
+        }
+        logger.verbose(
+          `Parsed spec: Name='${packageName}', InstallSpec='${installSpec}'`,
+        );
+      } else {
+        // Assume it's a path or a package name without version
+        packageName = nameOrPathOrSpec;
+        installSpec = nameOrPathOrSpec;
+      }
 
       try {
         // 1. Basic validation
-        if (!nameOrPath || typeof nameOrPath !== 'string') {
-          throw new Error('Invalid plugin name or path provided.');
+        if (!nameOrPathOrSpec || typeof nameOrPathOrSpec !== 'string') {
+          throw new Error('Invalid plugin name, path, or spec provided.');
         }
 
-        // 2. Attempt to resolve
+        // 2. Attempt to resolve using the parsed package name or path
         try {
-          resolvedPath = require.resolve(nameOrPath);
-          logger.verbose(`Plugin found locally at: ${resolvedPath}`);
+          resolvedPath = require.resolve(packageName);
+          logger.verbose(
+            `Plugin '${packageName}' found locally at: ${resolvedPath}`,
+          );
         } catch (resolveError: any) {
           if (resolveError.code === 'MODULE_NOT_FOUND') {
-            logger.warn(`Plugin '${nameOrPath}' not found locally.`);
+            logger.warn(`Plugin '${packageName}' not found locally.`);
             if (options.install) {
-              logger.info(
-                `Attempting to install '${nameOrPath}' globally via npm...`,
-              );
-              try {
-                const installCommand = `npm install -g ${nameOrPath}`;
-                logger.verbose(`Executing: ${installCommand}`);
-                const { stderr } = await execPromise(installCommand);
-                if (stderr) {
-                  logger.warn(
-                    `Installation warnings for ${nameOrPath}:\n${stderr}`,
-                  );
-                }
-                logger.success(`Successfully installed '${nameOrPath}'.`);
-                // Now try to resolve again after installation
-                resolvedPath = require.resolve(nameOrPath);
-                logger.verbose(
-                  `Plugin resolved after install: ${resolvedPath}`,
-                );
-              } catch (installError: any) {
+              // Use the potentially versioned spec for installation
+              const installSuccess = await installPluginGlobally(installSpec);
+              if (!installSuccess) {
                 logger.error(
-                  `Failed to automatically install '${nameOrPath}':`,
-                  installError.message || installError,
+                  `Failed to automatically install '${installSpec}'. Exiting.`,
                 );
                 return; // Stop if installation failed
               }
+              // Now try to resolve again using the BASE package name
+              try {
+                resolvedPath = require.resolve(packageName);
+                logger.verbose(
+                  `Plugin '${packageName}' resolved after install: ${resolvedPath}`,
+                );
+              } catch (postInstallResolveError) {
+                logger.error(
+                  `Failed to resolve '${packageName}' after successful installation. Check package contents.`,
+                  postInstallResolveError,
+                );
+                return;
+              }
             } else {
-              logger.error('Plugin not found and --install flag not provided.');
+              logger.error(
+                `Plugin '${packageName}' not found and --install flag not provided.`,
+              );
               logger.warn(
-                `Please install it (e.g., \`npm install -g ${nameOrPath}\`) or use --install.`,
+                `Please install it (e.g., \`npm install -g ${installSpec}\`) or use --install.`,
               );
               return; // Stop processing
             }
@@ -115,22 +150,22 @@ export function registerPluginCommands(program: Command) {
         // Should have a resolved path here if successful
         if (!resolvedPath) {
           logger.error(
-            `Failed to resolve plugin '${nameOrPath}' even after attempting install.`,
+            `Failed to resolve plugin '${packageName}' even after attempting install.`,
           );
           return;
         }
 
-        // 3. Add to registry using the original name and the *resolved* path
+        // 3. Add to registry
         const added = await addPluginToGlobalConfig({
-          name: nameOrPath, // Keep the name user provided (could be package name or local relative path)
-          path: resolvedPath, // Store the absolute path we know works
+          name: packageName,
+          path: resolvedPath,
           options: {},
         });
         if (!added) {
-          logger.warn(`Plugin '${nameOrPath}' is already registered.`);
+          logger.warn(`Plugin '${packageName}' is already registered.`);
         }
       } catch (error) {
-        logger.error(`Failed to add plugin '${nameOrPath}':`, error);
+        logger.error(`Failed to add plugin '${nameOrPathOrSpec}':`, error);
       }
     });
 
@@ -192,7 +227,6 @@ export function registerPluginCommands(program: Command) {
             if (removed) {
               removedCount++;
             }
-            // Log even if removal failed (shouldn't happen if findBrokenPlugins was accurate)
           }
           logger.success(
             `Cleanup complete. Removed ${removedCount} plugin(s) from the registry.`,

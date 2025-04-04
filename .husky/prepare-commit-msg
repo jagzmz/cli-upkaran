@@ -1,7 +1,0 @@
-#!/bin/sh
-# Husky v9+ requires no extra sourcing line
-
-# Run the node script to potentially update the changeset summary
-# Pass commit message file ($1) and source ($2) as arguments
-# Removed `exec < /dev/tty &&` as it fails in some non-terminal environments (like IDE Git UI)
-# node .github/scripts/prepare-changeset-summary.js "$1" "$2" 

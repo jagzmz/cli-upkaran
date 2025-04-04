@@ -1,6 +1,6 @@
 {
   "name": "@cli-upkaran/cli",
-  "version": "0.0.2-beta.2",
+  "version": "0.0.2-beta.3",
   "description": "Main CLI entry point for the cli-upkaran toolkit",
   "bin": {
     "cli-upkaran": "./dist/index.js"

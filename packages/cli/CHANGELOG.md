@@ -1,5 +1,11 @@
 # @cli-upkaran/cli
 
+## 0.0.2-beta.3
+
+### Patch Changes
+
+- a35d5a7: refactor: enhance plugin installation function with base name verification
+
 ## 0.0.2-beta.2
 
 ### Patch Changes

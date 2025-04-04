@@ -10,5 +10,15 @@
     "@cli-upkaran/digest": "0.0.1",
     "@cli-upkaran/fetch": "0.0.1"
   },
-  "changesets": []
+  "changesets": [
+    "full-boats-behave",
+    "ripe-dodos-give",
+    "ripe-eagles-notice",
+    "seven-animals-allow",
+    "seven-feet-check",
+    "stale-pumas-cry",
+    "two-masks-care",
+    "weak-glasses-repair",
+    "wise-streets-smoke"
+  ]
 }

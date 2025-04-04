@@ -145,12 +145,6 @@ importers:
       '@clack/prompts':
         specifier: ^0.7.0
         version: 0.7.0
-      '@cli-upkaran/command-digest':
-        specifier: workspace:*
-        version: link:../upkarans/command-digest
-      '@cli-upkaran/command-fetch':
-        specifier: workspace:*
-        version: link:../upkarans/command-fetch
       '@cli-upkaran/core':
         specifier: workspace:*
         version: link:../core

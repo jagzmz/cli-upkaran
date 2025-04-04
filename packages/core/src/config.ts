@@ -3,8 +3,12 @@ import type { GlobalConfig, PluginConfig } from './types.js';
 import os from 'node:os';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { createRequire } from 'node:module';
 
 export const CONFIG_VERSION = '1';
+
+// Helper require for internal resolution checks
+const internalRequire = createRequire(import.meta.url);
 
 // Default configuration
 const defaultConfig: GlobalConfig = {
@@ -168,4 +172,66 @@ export async function writePluginConfig(config: GlobalConfig): Promise<void> {
     logger.error(`Error writing config file ${registryPath}:`, error);
     throw error; // Let caller handle
   }
+}
+
+/**
+ * Attempts to resolve a plugin's path, checking both name and path fields.
+ * Logs details verbosely.
+ * Returns the resolved absolute path if successful, null otherwise.
+ */
+function resolveSinglePlugin(config: PluginConfig): string | null {
+  const { name, path: registeredPath } = config;
+  try {
+    // Try name first
+    const resolvedByName = internalRequire.resolve(name);
+    logger.verbose(`  [OK] Plugin '${name}' resolved by name to: ${resolvedByName}`);
+    return resolvedByName;
+  } catch (nameError: any) {
+    if (nameError.code !== 'MODULE_NOT_FOUND') {
+      logger.warn(`  [Warn] Unexpected error resolving '${name}' by name:`, nameError);
+    } else {
+        logger.verbose(`  [Info] Could not resolve '${name}' by name. Trying path '${registeredPath}'.`);
+    }
+    // Fall through to try path
+  }
+
+  try {
+    // Try registered path (handling relative/absolute/package)
+    let resolvedByPath: string;
+    if (path.isAbsolute(registeredPath) || !registeredPath.match(/^\.\.?[\\\/]/)) {
+      resolvedByPath = internalRequire.resolve(registeredPath);
+      logger.verbose(`  [OK] Plugin '${name}' resolved by path (abs/pkg) '${registeredPath}' to: ${resolvedByPath}`);
+    } else {
+      resolvedByPath = path.resolve(process.cwd(), registeredPath);
+      internalRequire.resolve(resolvedByPath); // Check existence
+      logger.verbose(`  [OK] Plugin '${name}' resolved by path (rel) '${registeredPath}' to CWD: ${resolvedByPath}`);
+    }
+    return resolvedByPath;
+  } catch (pathError: any) {
+    if (pathError.code !== 'MODULE_NOT_FOUND') {
+        logger.warn(`  [Warn] Unexpected error resolving '${name}' by path '${registeredPath}':`, pathError);
+    }
+    logger.verbose(`  [Fail] Could not resolve plugin '${name}' by path '${registeredPath}'.`);
+    return null;
+  }
+}
+
+/**
+ * Validates the plugins listed in the global config, identifying unresolvable ones.
+ * Returns an array of PluginConfig objects for the plugins that could NOT be resolved.
+ */
+export async function findBrokenPlugins(): Promise<PluginConfig[]> {
+    const config = await readGlobalConfig();
+    const registeredPlugins = config.plugins ?? [];
+    const brokenPlugins: PluginConfig[] = [];
+
+    logger.verbose(`Validating ${registeredPlugins.length} registered plugins...`);
+    for (const plugin of registeredPlugins) {
+        const resolvedPath = resolveSinglePlugin(plugin);
+        if (!resolvedPath) {
+            brokenPlugins.push(plugin);
+        }
+    }
+    logger.verbose(`Validation complete. Found ${brokenPlugins.length} potentially broken plugins.`);
+    return brokenPlugins;
 }

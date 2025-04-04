@@ -24,8 +24,6 @@
   "license": "MIT",
   "dependencies": {
     "@clack/prompts": "^0.7.0",
-    "@cli-upkaran/command-digest": "workspace:*",
-    "@cli-upkaran/command-fetch": "workspace:*",
     "@cli-upkaran/core": "workspace:*",
     "chalk": "^5.3.0",
     "cli-table3": "^0.6.5",

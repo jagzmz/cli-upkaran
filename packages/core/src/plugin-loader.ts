@@ -9,15 +9,57 @@ import type {
   CommandPlugin, // The structure returned by registerCommands
 } from './types.js';
 
-// Helper to get the require function relative to this module
-// This is still useful for require.resolve
+// Helper require
 const require = createRequire(import.meta.url);
 
 /**
+ * Attempts to resolve a plugin path, prioritizing name resolution.
+ * Returns the resolved path or null if resolution fails.
+ */
+function tryResolvePluginPath(config: PluginConfig): string | null {
+  const { name, path: registeredPath } = config;
+  let resolvedPath: string | null = null;
+
+  // 1. Try resolving by name first (most robust for installed packages)
+  try {
+    resolvedPath = require.resolve(name);
+    logger.verbose(`Resolved plugin '${name}' by name to: ${resolvedPath}`);
+    return resolvedPath;
+  } catch (nameError: any) {
+    if (nameError.code !== 'MODULE_NOT_FOUND') {
+      logger.warn(`Unexpected error resolving plugin '${name}' by name:`, nameError);
+      // Continue to try resolving by path
+    } else {
+        logger.verbose(`Could not resolve plugin '${name}' by name. Trying registered path '${registeredPath}'...`);
+    }
+  }
+
+  // 2. If name resolution failed, try resolving by the registered path
+  try {
+    if (path.isAbsolute(registeredPath) || !registeredPath.match(/^\.\.?[\\\/]/)) {
+      // Absolute path or potential package name (might be same as name, but try again)
+      resolvedPath = require.resolve(registeredPath);
+      logger.verbose(`Resolved plugin '${name}' (path: package/absolute) to: ${resolvedPath}`);
+    } else {
+      // Relative path - resolve relative to CWD
+      resolvedPath = path.resolve(process.cwd(), registeredPath);
+      // Check if relative path resolution actually finds the file before claiming success
+      require.resolve(resolvedPath); // This will throw if the resolved path doesn't exist
+      logger.verbose(`Resolved plugin '${name}' (path: relative) to CWD: ${resolvedPath}`);
+    }
+    return resolvedPath;
+  } catch (pathError: any) {
+    if (pathError.code !== 'MODULE_NOT_FOUND') {
+      logger.warn(`Unexpected error resolving plugin '${name}' by path '${registeredPath}':`, pathError);
+    }
+    // If path resolution also fails, return null
+    return null;
+  }
+}
+
+/**
  * Dynamically loads command plugins based on the provided configurations.
- *
- * @param pluginConfigs - An array of plugin configurations (name, path, options).
- * @returns A promise resolving to an array of successfully loaded command plugin definitions.
+ * Skips plugins that cannot be resolved or loaded, logging errors.
  */
 export async function loadCommandPlugins(
   pluginConfigs: PluginConfig[],
@@ -28,34 +70,24 @@ export async function loadCommandPlugins(
   );
 
   for (const config of pluginConfigs) {
-    const { name: pluginName, path: pluginPath, options: pluginOptions } = config;
-    let resolvedPath: string;
-    let modulePathToImport: string;
+    const { name: pluginName } = config;
+    let modulePathToImport: string | null = null;
 
     try {
-      // Resolve the plugin path: Absolute paths and package names are handled directly.
-      // Relative paths need to be resolved relative to the CWD.
-      if (path.isAbsolute(pluginPath) || !pluginPath.match(/^\.\.?[\\\/]/)) {
-        // Absolute path or potential package name
-        resolvedPath = require.resolve(pluginPath);
-        logger.verbose(`Resolved plugin '${pluginName}' (package/absolute) to: ${resolvedPath}`);
-      } else {
-        // Relative path - resolve relative to the current working directory
-        resolvedPath = path.resolve(process.cwd(), pluginPath);
-        logger.verbose(`Resolved plugin '${pluginName}' (relative) to CWD: ${resolvedPath}`);
+      // Attempt to resolve the plugin path
+      modulePathToImport = tryResolvePluginPath(config);
+
+      if (!modulePathToImport) {
+        logger.error(`Failed to resolve plugin '${pluginName}'. Check name and path ('${config.path}'). Skipping.`);
+        continue; // Skip to the next plugin
       }
 
-      // Determine the path for dynamic import (may need file:// URL)
-      // Simple approach for now, might need refinement for edge cases/Windows
-      modulePathToImport = resolvedPath;
-      // Consider using pathToFileURL if imports fail on Windows
-      // modulePathToImport = pathToFileURL(resolvedPath).href;
-
       // Dynamically import the module
+      // Use try-catch specifically around import and execution
       const pluginModule = await import(modulePathToImport);
       logger.verbose(`Successfully imported module: ${pluginName} from ${modulePathToImport}`);
 
-      // Check for the registration function (e.g., registerCommands)
+      // Check for the registration function
       if (
         pluginModule.registerCommands &&
         typeof pluginModule.registerCommands === 'function'
@@ -71,41 +103,39 @@ export async function loadCommandPlugins(
 
         pluginsPartsToAdd.forEach((pluginDefPart) => {
           if (pluginDefPart?.type === 'command' && pluginDefPart.commands) {
-            // Explicitly type cmd parameter
             const commandsWithPackageName = pluginDefPart.commands.map(
               (cmd: CommandDefinition) => ({
                 ...cmd,
-                packageName: pluginName, // Use name from original config
+                packageName: pluginName,
               }),
             );
-
-            // Construct the LoadedCommandPlugin object
             const loadedPlugin: LoadedCommandPlugin = {
-              ...config, // Spread original config (name, path, options)
-              type: 'command', // Add type from loaded part
-              commands: commandsWithPackageName, // Add processed commands
+              ...config,
+              type: 'command',
+              commands: commandsWithPackageName,
             };
             loadedPlugins.push(loadedPlugin);
             logger.verbose(`Processed command plugin: ${pluginName}`);
           } else {
             logger.warn(
-              `Invalid plugin structure returned by registerCommands in ${pluginName}. Skipping part.`,
+              `Invalid structure from registerCommands in ${pluginName}. Skipping part.`,
             );
           }
         });
       } else {
         logger.warn(
-          `Plugin module ${pluginName} does not export a 'registerCommands' function. Skipping.`,
+          `Plugin module ${pluginName} does not export 'registerCommands'. Skipping.`,
         );
       }
-    } catch (error) {
-      logger.error(`Failed to load plugin '${pluginName}' from path '${pluginPath}':`, error);
-      // Optionally re-throw or continue loading others
+    } catch (loadError) {
+      // Catch errors during import or execution for *this specific plugin*
+      logger.error(`Failed to load or execute plugin '${pluginName}' from ${modulePathToImport || config.path}:`, loadError);
+      // Continue to the next plugin
     }
   }
 
-  logger.verbose(
-    `Finished processing plugins. Total command plugins loaded: ${loadedPlugins.length}`,
+  logger.info(
+    `Finished processing plugins. Successfully loaded: ${loadedPlugins.length}/${pluginConfigs.length}`,
   );
   return loadedPlugins;
 }

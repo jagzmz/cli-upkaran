@@ -4,16 +4,29 @@ import {
     getGlobalConfig,
     addPluginToGlobalConfig,
     removePluginFromGlobalConfig,
+    findBrokenPlugins,
 } from '@cli-upkaran/core';
 import { createRequire } from 'node:module';
 import { exec } from 'node:child_process';
 import util from 'node:util';
+import readline from 'node:readline/promises';
 
 // Promisify exec for easier async/await usage
 const execPromise = util.promisify(exec);
 
 // Helper to resolve modules relative to this file
 const require = createRequire(import.meta.url);
+
+// Function to ask for confirmation
+async function askConfirmation(query: string): Promise<boolean> {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+    });
+    const answer = await rl.question(`${query} (yes/no): `);
+    rl.close();
+    return answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'y';
+}
 
 export function registerPluginCommands(program: Command) {
     const pluginsCommand = program.command('plugins')
@@ -46,21 +59,21 @@ export function registerPluginCommands(program: Command) {
         .addOption(new Option('--install', 'Attempt to automatically install the plugin if not found').default(false))
         .action(async (nameOrPath: string, options: { install: boolean }) => {
             logger.info(`Attempting to add plugin: ${nameOrPath}`);
+            let resolvedPath: string | null = null;
+
             try {
                 // 1. Basic validation
                 if (!nameOrPath || typeof nameOrPath !== 'string') {
                     throw new Error('Invalid plugin name or path provided.');
                 }
 
-                // 2. Check if plugin is resolvable/installed
+                // 2. Attempt to resolve
                 try {
-                    const resolvedPath = require.resolve(nameOrPath);
-                    logger.verbose(`Plugin resolved successfully at: ${resolvedPath}`);
+                    resolvedPath = require.resolve(nameOrPath);
+                    logger.verbose(`Plugin found locally at: ${resolvedPath}`);
                 } catch (resolveError: any) {
                     if (resolveError.code === 'MODULE_NOT_FOUND') {
-                        logger.error(`Plugin '${nameOrPath}' could not be found.`);
-
-                        // Attempt installation only if --install flag is present
+                        logger.warn(`Plugin '${nameOrPath}' not found locally.`);
                         if (options.install) {
                             logger.info(`Attempting to install '${nameOrPath}' globally via npm...`);
                             try {
@@ -68,38 +81,38 @@ export function registerPluginCommands(program: Command) {
                                 logger.verbose(`Executing: ${installCommand}`);
                                 const { stdout, stderr } = await execPromise(installCommand);
                                 if (stderr) {
-                                    logger.warn(`Installation warnings for ${nameOrPath}:
-${stderr}`);
+                                    logger.warn(`Installation warnings for ${nameOrPath}:\n${stderr}`);
                                 }
-                                logger.success(`Successfully installed '${nameOrPath}'.
-${stdout}`);
-                                // Now proceed to add it to the registry after successful install
+                                logger.success(`Successfully installed '${nameOrPath}'.`);
+                                // Now try to resolve again after installation
+                                resolvedPath = require.resolve(nameOrPath);
+                                logger.verbose(`Plugin resolved after install: ${resolvedPath}`);
                             } catch (installError: any) {
                                 logger.error(`Failed to automatically install '${nameOrPath}':`, installError.message || installError);
-                                if (installError.stderr) {
-                                    logger.error(`Installation stderr:
-${installError.stderr}`);
-                                }
-                                logger.warn('Please try installing it manually and then run add again.');
                                 return; // Stop if installation failed
                             }
                         } else {
-                            // If --install was not used, suggest manual installation
-                            logger.warn(`Please ensure it is installed (e.g., run \`npm install -g ${nameOrPath}\`) or provide a correct path.`);
-                            logger.warn(`Alternatively, run this command again with the --install flag to attempt automatic installation.`);
-                            return; // Stop processing if not resolvable and not installing
+                            logger.error('Plugin not found and --install flag not provided.');
+                            logger.warn(`Please install it (e.g., \`npm install -g ${nameOrPath}\`) or use --install.`);
+                            return; // Stop processing
                         }
                     } else {
-                        // Handle other resolution errors
-                        logger.error(`Error trying to resolve plugin '${nameOrPath}':`, resolveError);
-                        return; // Stop processing on other resolution errors
+                        throw resolveError; // Re-throw other resolution errors
                     }
                 }
 
-                const resolvedPath = require.resolve(nameOrPath);
+                // Should have a resolved path here if successful
+                if (!resolvedPath) {
+                     logger.error(`Failed to resolve plugin '${nameOrPath}' even after attempting install.`);
+                     return;
+                }
 
-                // 3. Add to registry (only happens if resolved initially or installed successfully)
-                const added = await addPluginToGlobalConfig({ name: nameOrPath, path: resolvedPath, options: {} });
+                // 3. Add to registry using the original name and the *resolved* path
+                const added = await addPluginToGlobalConfig({
+                    name: nameOrPath,    // Keep the name user provided (could be package name or local relative path)
+                    path: resolvedPath,  // Store the absolute path we know works
+                    options: {}
+                });
                 if (!added) {
                     logger.warn(`Plugin '${nameOrPath}' is already registered.`);
                 }
@@ -126,6 +139,46 @@ ${installError.stderr}`);
                 }
             } catch (error) {
                 logger.error(`Failed to remove plugin '${nameOrPath}':`, error);
+            }
+        });
+
+    // plugins:cleanup
+    pluginsCommand
+        .command('cleanup')
+        .description('Find and optionally remove registered plugins that cannot be resolved')
+        .action(async () => {
+            logger.info('Checking registry for broken plugins...');
+            try {
+                const brokenPlugins = await findBrokenPlugins();
+
+                if (brokenPlugins.length === 0) {
+                    logger.success('Registry check complete. No broken plugins found.');
+                    return;
+                }
+
+                logger.warn(`Found ${brokenPlugins.length} potentially broken plugin(s):`);
+                brokenPlugins.forEach(p => {
+                    console.log(`  - Name: ${p.name}, Registered Path: ${p.path}`);
+                });
+
+                const confirmed = await askConfirmation('Do you want to remove these plugins from the registry?');
+
+                if (confirmed) {
+                    logger.info('Removing broken plugins...');
+                    let removedCount = 0;
+                    for (const plugin of brokenPlugins) {
+                        const removed = await removePluginFromGlobalConfig(plugin.name);
+                        if (removed) {
+                            removedCount++;
+                        }
+                        // Log even if removal failed (shouldn't happen if findBrokenPlugins was accurate)
+                    }
+                    logger.success(`Cleanup complete. Removed ${removedCount} plugin(s) from the registry.`);
+                } else {
+                    logger.info('Cleanup aborted. No changes made to the registry.');
+                }
+            } catch (error) {
+                logger.error('Failed during plugin cleanup:', error);
             }
         });
 } 

@@ -87,11 +87,11 @@ class WebsiteAdapter implements Adapter {
         fetchError = new Error(`Fetch failed: ${error.message}`);
       } finally {
         if (controller.signal.aborted) {
-           spinner.warn(`Aborted: ${url}`); 
+          spinner.warn(`Aborted: ${url}`);
         } else if (fetchError) {
-           spinner.fail(`Failed: ${url}`);
+          spinner.fail(`Failed: ${url}`);
         } else {
-           spinner.succeed(`Fetched: ${url} (${fetchResult?.status ?? '?'})`);
+          spinner.succeed(`Fetched: ${url} (${fetchResult?.status ?? '?'})`);
         }
       }
 
@@ -167,7 +167,9 @@ class WebsiteAdapter implements Adapter {
               (!limit || fetchedCount < limit)
             ) {
               // Log adding subsequent URLs
-              logger.verbose(`[${this.name}] Adding discovered URL to queue: ${nextUrl}`);
+              logger.verbose(
+                `[${this.name}] Adding discovered URL to queue: ${nextUrl}`,
+              );
               queue.add(() => processUrl(nextUrl, depth + 1));
             }
           }
@@ -198,19 +200,23 @@ class WebsiteAdapter implements Adapter {
         logger.info(`[${this.name}] Treating source as single URL to fetch.`);
         queue.add(() => processUrl(source, 0));
       } else {
-         // If no initial URLs and it looks like a sitemap, yield nothing and exit.
-         logger.info(`[${this.name}] No URLs found in sitemap, finishing stream.`);
-         return; 
+        // If no initial URLs and it looks like a sitemap, yield nothing and exit.
+        logger.info(
+          `[${this.name}] No URLs found in sitemap, finishing stream.`,
+        );
+        return;
       }
     } else {
       logger.info(
         `[${this.name}] Starting crawl/fetch with ${initialUrls.length} initial URLs.`,
       );
       // Log the initial URLs found
-      logger.verbose(`[${this.name}] Initial URLs: ${JSON.stringify(initialUrls)}`); 
+      logger.verbose(
+        `[${this.name}] Initial URLs: ${JSON.stringify(initialUrls)}`,
+      );
       initialUrls.forEach((url) => {
-         logger.verbose(`[${this.name}] Adding initial URL to queue: ${url}`);
-         queue.add(() => processUrl(url, 0))
+        logger.verbose(`[${this.name}] Adding initial URL to queue: ${url}`);
+        queue.add(() => processUrl(url, 0));
       });
     }
 
@@ -218,7 +224,9 @@ class WebsiteAdapter implements Adapter {
     logger.verbose(`[${this.name}] Entering streaming loop...`);
     while (queue.size > 0 || queue.pending > 0 || resultsBuffer.length > 0) {
       // Log queue and buffer state at start of loop iteration
-      logger.verbose(`[${this.name}] Loop State - Queue Size: ${queue.size}, Pending: ${queue.pending}, Buffer Length: ${resultsBuffer.length}`);
+      logger.verbose(
+        `[${this.name}] Loop State - Queue Size: ${queue.size}, Pending: ${queue.pending}, Buffer Length: ${resultsBuffer.length}`,
+      );
 
       // Yield all items currently in the buffer
       while (resultsBuffer.length > 0) {
@@ -226,7 +234,7 @@ class WebsiteAdapter implements Adapter {
       }
       // If buffer is empty but queue is still processing, wait briefly
       if (resultsBuffer.length === 0 && (queue.size > 0 || queue.pending > 0)) {
-        await new Promise(resolve => setTimeout(resolve, 50)); // Small delay
+        await new Promise((resolve) => setTimeout(resolve, 50)); // Small delay
       }
     }
 

@@ -19,10 +19,10 @@ import util from 'node:util';
 import readline from 'node:readline/promises';
 // Import helpers from utils
 import {
-    askConfirmation,
-    checkLocalPlugin,
-    checkNpmAvailability,
-    installPluginGlobally,
+  askConfirmation,
+  checkLocalPlugin,
+  checkNpmAvailability,
+  installPluginGlobally,
 } from './utils/index.js';
 
 // Helper require (can be used for local resolution checks)
@@ -48,16 +48,16 @@ async function main() {
       '--plugin <path_or_name>',
       'Load specific command plugin(s) (overrides registry)',
       (value, previous: string[] = []) => previous.concat(value),
-      [] // Ensure default is an empty array
+      [], // Ensure default is an empty array
     );
   // TODO: Add --config option
 
   // Parse global options early to set up logger and config
   // Use parseOptions to avoid executing default command/help
   program.parseOptions(process.argv);
-  let globalOpts = program.opts(); // Use let as we might modify globalOpts.plugin
+  const globalOpts = program.opts(); // Use let as we might modify globalOpts.plugin
 
-  // --- Pre-check and Install Logic for --plugin --- 
+  // --- Pre-check and Install Logic for --plugin ---
   if (globalOpts.plugin && globalOpts.plugin.length > 0) {
     logger.verbose('Validating plugins provided via --plugin...');
     const validatedPlugins: string[] = [];
@@ -73,12 +73,14 @@ async function main() {
       const isAvailableOnNpm = await checkNpmAvailability(requestedPlugin);
 
       if (!isAvailableOnNpm) {
-        logger.error(`Plugin '${requestedPlugin}' not found locally or on npm registry.`);
+        logger.error(
+          `Plugin '${requestedPlugin}' not found locally or on npm registry.`,
+        );
         process.exit(1); // Exit if explicitly requested plugin is unavailable
       }
 
       const installConfirmed = await askConfirmation(
-        `Plugin '${requestedPlugin}' is available on npm. Install it globally?`
+        `Plugin '${requestedPlugin}' is available on npm. Install it globally?`,
       );
 
       if (!installConfirmed) {
@@ -95,24 +97,28 @@ async function main() {
       // After successful install, resolve again and add to registry
       resolvedPath = checkLocalPlugin(requestedPlugin);
       if (!resolvedPath) {
-         logger.error(`Failed to resolve '${requestedPlugin}' after installation. Exiting.`);
-         process.exit(1);
+        logger.error(
+          `Failed to resolve '${requestedPlugin}' after installation. Exiting.`,
+        );
+        process.exit(1);
       }
 
       logger.info(`Registering newly installed plugin '${requestedPlugin}'...`);
       await addPluginToGlobalConfig({
-          name: requestedPlugin,
-          path: resolvedPath,
-          options: {}
+        name: requestedPlugin,
+        path: resolvedPath,
+        options: {},
       });
       // Keep it in the list for this run
       validatedPlugins.push(requestedPlugin);
     }
     // Update globalOpts to only contain validated/installed plugins for this run
     globalOpts.plugin = validatedPlugins;
-    logger.verbose(`Proceeding with validated --plugin list: ${validatedPlugins.join(', ')}`);
+    logger.verbose(
+      `Proceeding with validated --plugin list: ${validatedPlugins.join(', ')}`,
+    );
   }
-  // --- End Pre-check --- 
+  // --- End Pre-check ---
 
   // Load configuration (passing initial CLI args)
   const config: GlobalConfig = await loadGlobalConfig(globalOpts);
@@ -146,7 +152,9 @@ async function main() {
     .map((cmd) => cmd.name())
     .concat(program.commands.flatMap((cmd) => cmd.aliases()));
   // Check if any command-line argument explicitly matches a known command name or alias
-  const commandProvided = commandArgs.some((arg) => knownCommands.includes(arg));
+  const commandProvided = commandArgs.some((arg) =>
+    knownCommands.includes(arg),
+  );
 
   const isInteractiveTrigger = !commandProvided && !isHelp && !isVersion;
 

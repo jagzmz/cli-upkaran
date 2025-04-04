@@ -55,12 +55,14 @@ export async function runPipeline(
       options.transformContext || {},
     );
 
-    async function *transformedStreamWrapper() {
+    async function* transformedStreamWrapper() {
       for await (const item of transformedStream) {
         itemCount++;
         if (item.error) {
           errorCount++;
-          logger.warn(`Error processing item ${item.id}: ${item.error.message}`);
+          logger.warn(
+            `Error processing item ${item.id}: ${item.error.message}`,
+          );
           logger.verbose(item.error.stack);
           // Decide whether to include errored items in the output - currently including
         }

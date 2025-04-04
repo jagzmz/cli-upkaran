@@ -106,7 +106,9 @@ export async function loadGlobalConfig(
   let finalPlugins: PluginConfig[] = [];
 
   if (cliPlugins && cliPlugins.length > 0) {
-    logger.verbose(`Loading plugins exclusively from --plugin CLI arguments: ${cliPlugins.join(', ')}`);
+    logger.verbose(
+      `Loading plugins exclusively from --plugin CLI arguments: ${cliPlugins.join(', ')}`,
+    );
     // Use only plugins from CLI args
     finalPlugins = cliPlugins.map((p) => ({
       name: p, // Use the provided string as name
@@ -184,13 +186,20 @@ function resolveSinglePlugin(config: PluginConfig): string | null {
   try {
     // Try name first
     const resolvedByName = internalRequire.resolve(name);
-    logger.verbose(`  [OK] Plugin '${name}' resolved by name to: ${resolvedByName}`);
+    logger.verbose(
+      `  [OK] Plugin '${name}' resolved by name to: ${resolvedByName}`,
+    );
     return resolvedByName;
   } catch (nameError: any) {
     if (nameError.code !== 'MODULE_NOT_FOUND') {
-      logger.warn(`  [Warn] Unexpected error resolving '${name}' by name:`, nameError);
+      logger.warn(
+        `  [Warn] Unexpected error resolving '${name}' by name:`,
+        nameError,
+      );
     } else {
-        logger.verbose(`  [Info] Could not resolve '${name}' by name. Trying path '${registeredPath}'.`);
+      logger.verbose(
+        `  [Info] Could not resolve '${name}' by name. Trying path '${registeredPath}'.`,
+      );
     }
     // Fall through to try path
   }
@@ -198,20 +207,32 @@ function resolveSinglePlugin(config: PluginConfig): string | null {
   try {
     // Try registered path (handling relative/absolute/package)
     let resolvedByPath: string;
-    if (path.isAbsolute(registeredPath) || !registeredPath.match(/^\.\.?[\\\/]/)) {
+    if (
+      path.isAbsolute(registeredPath) ||
+      !registeredPath.match(/^\.\.?[\\\/]/)
+    ) {
       resolvedByPath = internalRequire.resolve(registeredPath);
-      logger.verbose(`  [OK] Plugin '${name}' resolved by path (abs/pkg) '${registeredPath}' to: ${resolvedByPath}`);
+      logger.verbose(
+        `  [OK] Plugin '${name}' resolved by path (abs/pkg) '${registeredPath}' to: ${resolvedByPath}`,
+      );
     } else {
       resolvedByPath = path.resolve(process.cwd(), registeredPath);
       internalRequire.resolve(resolvedByPath); // Check existence
-      logger.verbose(`  [OK] Plugin '${name}' resolved by path (rel) '${registeredPath}' to CWD: ${resolvedByPath}`);
+      logger.verbose(
+        `  [OK] Plugin '${name}' resolved by path (rel) '${registeredPath}' to CWD: ${resolvedByPath}`,
+      );
     }
     return resolvedByPath;
   } catch (pathError: any) {
     if (pathError.code !== 'MODULE_NOT_FOUND') {
-        logger.warn(`  [Warn] Unexpected error resolving '${name}' by path '${registeredPath}':`, pathError);
+      logger.warn(
+        `  [Warn] Unexpected error resolving '${name}' by path '${registeredPath}':`,
+        pathError,
+      );
     }
-    logger.verbose(`  [Fail] Could not resolve plugin '${name}' by path '${registeredPath}'.`);
+    logger.verbose(
+      `  [Fail] Could not resolve plugin '${name}' by path '${registeredPath}'.`,
+    );
     return null;
   }
 }
@@ -221,17 +242,21 @@ function resolveSinglePlugin(config: PluginConfig): string | null {
  * Returns an array of PluginConfig objects for the plugins that could NOT be resolved.
  */
 export async function findBrokenPlugins(): Promise<PluginConfig[]> {
-    const config = await readGlobalConfig();
-    const registeredPlugins = config.plugins ?? [];
-    const brokenPlugins: PluginConfig[] = [];
+  const config = await readGlobalConfig();
+  const registeredPlugins = config.plugins ?? [];
+  const brokenPlugins: PluginConfig[] = [];
 
-    logger.verbose(`Validating ${registeredPlugins.length} registered plugins...`);
-    for (const plugin of registeredPlugins) {
-        const resolvedPath = resolveSinglePlugin(plugin);
-        if (!resolvedPath) {
-            brokenPlugins.push(plugin);
-        }
+  logger.verbose(
+    `Validating ${registeredPlugins.length} registered plugins...`,
+  );
+  for (const plugin of registeredPlugins) {
+    const resolvedPath = resolveSinglePlugin(plugin);
+    if (!resolvedPath) {
+      brokenPlugins.push(plugin);
     }
-    logger.verbose(`Validation complete. Found ${brokenPlugins.length} potentially broken plugins.`);
-    return brokenPlugins;
+  }
+  logger.verbose(
+    `Validation complete. Found ${brokenPlugins.length} potentially broken plugins.`,
+  );
+  return brokenPlugins;
 }

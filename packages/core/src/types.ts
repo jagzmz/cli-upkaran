@@ -2,7 +2,6 @@
 // Replace with the actual type from the chosen CLI framework (commander or cac)
 import type { Command } from 'commander';
 
-
 export interface PluginConfig {
   name: string;
   path: string;

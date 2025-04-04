@@ -27,30 +27,45 @@ function tryResolvePluginPath(config: PluginConfig): string | null {
     return resolvedPath;
   } catch (nameError: any) {
     if (nameError.code !== 'MODULE_NOT_FOUND') {
-      logger.warn(`Unexpected error resolving plugin '${name}' by name:`, nameError);
+      logger.warn(
+        `Unexpected error resolving plugin '${name}' by name:`,
+        nameError,
+      );
       // Continue to try resolving by path
     } else {
-        logger.verbose(`Could not resolve plugin '${name}' by name. Trying registered path '${registeredPath}'...`);
+      logger.verbose(
+        `Could not resolve plugin '${name}' by name. Trying registered path '${registeredPath}'...`,
+      );
     }
   }
 
   // 2. If name resolution failed, try resolving by the registered path
   try {
-    if (path.isAbsolute(registeredPath) || !registeredPath.match(/^\.\.?[\\\/]/)) {
+    if (
+      path.isAbsolute(registeredPath) ||
+      !registeredPath.match(/^\.\.?[\\\/]/)
+    ) {
       // Absolute path or potential package name (might be same as name, but try again)
       resolvedPath = require.resolve(registeredPath);
-      logger.verbose(`Resolved plugin '${name}' (path: package/absolute) to: ${resolvedPath}`);
+      logger.verbose(
+        `Resolved plugin '${name}' (path: package/absolute) to: ${resolvedPath}`,
+      );
     } else {
       // Relative path - resolve relative to CWD
       resolvedPath = path.resolve(process.cwd(), registeredPath);
       // Check if relative path resolution actually finds the file before claiming success
       require.resolve(resolvedPath); // This will throw if the resolved path doesn't exist
-      logger.verbose(`Resolved plugin '${name}' (path: relative) to CWD: ${resolvedPath}`);
+      logger.verbose(
+        `Resolved plugin '${name}' (path: relative) to CWD: ${resolvedPath}`,
+      );
     }
     return resolvedPath;
   } catch (pathError: any) {
     if (pathError.code !== 'MODULE_NOT_FOUND') {
-      logger.warn(`Unexpected error resolving plugin '${name}' by path '${registeredPath}':`, pathError);
+      logger.warn(
+        `Unexpected error resolving plugin '${name}' by path '${registeredPath}':`,
+        pathError,
+      );
     }
     // If path resolution also fails, return null
     return null;
@@ -78,14 +93,18 @@ export async function loadCommandPlugins(
       modulePathToImport = tryResolvePluginPath(config);
 
       if (!modulePathToImport) {
-        logger.error(`Failed to resolve plugin '${pluginName}'. Check name and path ('${config.path}'). Skipping.`);
+        logger.error(
+          `Failed to resolve plugin '${pluginName}'. Check name and path ('${config.path}'). Skipping.`,
+        );
         continue; // Skip to the next plugin
       }
 
       // Dynamically import the module
       // Use try-catch specifically around import and execution
       const pluginModule = await import(modulePathToImport);
-      logger.verbose(`Successfully imported module: ${pluginName} from ${modulePathToImport}`);
+      logger.verbose(
+        `Successfully imported module: ${pluginName} from ${modulePathToImport}`,
+      );
 
       // Check for the registration function
       if (
@@ -129,7 +148,10 @@ export async function loadCommandPlugins(
       }
     } catch (loadError) {
       // Catch errors during import or execution for *this specific plugin*
-      logger.error(`Failed to load or execute plugin '${pluginName}' from ${modulePathToImport || config.path}:`, loadError);
+      logger.error(
+        `Failed to load or execute plugin '${pluginName}' from ${modulePathToImport || config.path}:`,
+        loadError,
+      );
       // Continue to the next plugin
     }
   }

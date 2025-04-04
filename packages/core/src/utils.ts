@@ -33,12 +33,15 @@ export function sleep(ms: number): Promise<void> {
  *     },
  *   },
  */
-export function printTree(tree: Record<string, any>, indent: string = ''): string {
+export function printTree(
+  tree: Record<string, any>,
+  indent: string = '',
+): string {
   let output = '';
-  
+
   for (const [key, value] of Object.entries(tree)) {
     output += `${indent}${key}\n`;
-    
+
     if (value && typeof value === 'object') {
       if (Array.isArray(value)) {
         // Handle arrays
@@ -56,16 +59,19 @@ export function printTree(tree: Record<string, any>, indent: string = ''): strin
           const isLast = index === entries.length - 1;
           const prefix = isLast ? '└── ' : '├── ';
           const childIndent = isLast ? `${indent}    ` : `${indent}│   `;
-          
+
           output += `${indent}${prefix}${nestedKey}\n`;
-          
+
           if (nestedValue && typeof nestedValue === 'object') {
-            output += printTree({ '': nestedValue }, childIndent).replace(/^    /, '');
+            output += printTree({ '': nestedValue }, childIndent).replace(
+              /^ {4}/,
+              '',
+            );
           }
         });
       }
     }
   }
-  
+
   return output;
 }

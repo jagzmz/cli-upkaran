@@ -16,13 +16,13 @@ export function constructCommandName(packageName: string, commandName: string) {
  * Asks the user for confirmation.
  */
 export async function askConfirmation(query: string): Promise<boolean> {
-    const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout,
-    });
-    const answer = await rl.question(`${query} (yes/no): `);
-    rl.close();
-    return answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'y';
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+  const answer = await rl.question(`${query} (yes/no): `);
+  rl.close();
+  return answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'y';
 }
 
 /**
@@ -46,7 +46,9 @@ export function checkLocalPlugin(nameOrPath: string): string | null {
 /**
  * Checks if a package name is available on the npm registry.
  */
-export async function checkNpmAvailability(packageName: string): Promise<boolean> {
+export async function checkNpmAvailability(
+  packageName: string,
+): Promise<boolean> {
   logger.verbose(`Checking npm availability for: ${packageName}`);
   try {
     await execPromise(`npm view ${packageName} version --json`); // Use --json for quieter output
@@ -62,7 +64,9 @@ export async function checkNpmAvailability(packageName: string): Promise<boolean
  * Installs a package globally using npm.
  * Returns true on success, false on failure.
  */
-export async function installPluginGlobally(packageName: string): Promise<boolean> {
+export async function installPluginGlobally(
+  packageName: string,
+): Promise<boolean> {
   logger.info(`Attempting to install '${packageName}' globally via npm...`);
   try {
     const installCommand = `npm install -g ${packageName}`;
@@ -70,21 +74,28 @@ export async function installPluginGlobally(packageName: string): Promise<boolea
     const { stdout, stderr } = await execPromise(installCommand);
     if (stderr) {
       // Often npm install -g shows warnings on stderr even on success
-      logger.warn(`Installation output (stderr) for ${packageName}:\n${stderr}`);
+      logger.warn(
+        `Installation output (stderr) for ${packageName}:\n${stderr}`,
+      );
     }
     // Consider stdout less critical unless debugging
     // logger.verbose(`Installation output (stdout) for ${packageName}:\n${stdout}`);
     logger.success(`Installation command for '${packageName}' finished.`);
     // Verify installation by resolving again
     if (checkLocalPlugin(packageName)) {
-        logger.success(`Successfully installed and verified '${packageName}'.`);
-        return true;
+      logger.success(`Successfully installed and verified '${packageName}'.`);
+      return true;
     } else {
-        logger.error(`Installation command ran for '${packageName}', but package still not resolvable.`);
-        return false;
+      logger.error(
+        `Installation command ran for '${packageName}', but package still not resolvable.`,
+      );
+      return false;
     }
   } catch (installError: any) {
-    logger.error(`Failed to automatically install '${packageName}':`, installError.message || installError);
+    logger.error(
+      `Failed to automatically install '${packageName}':`,
+      installError.message || installError,
+    );
     return false;
   }
 }

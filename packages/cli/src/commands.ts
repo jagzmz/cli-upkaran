@@ -71,7 +71,7 @@ export async function registerAllCommands(
     const loadedPlugins: LoadedCommandPlugin[] =
       await loadCommandPlugins(pluginConfigs);
 
-    let pluginTree: Record<string, any> = {};
+    const pluginTree: Record<string, any> = {};
     loadedPlugins.forEach((plugin) => {
       if (plugin.type === 'command' && plugin.commands) {
         plugin.commands.forEach((cmdDef: CommandDefinition, index: number) => {

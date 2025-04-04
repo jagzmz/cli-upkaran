@@ -1,6 +1,6 @@
 {
   "name": "@cli-upkaran/core",
-  "version": "0.0.2-beta.0",
+  "version": "0.0.2-beta.1",
   "description": "Core utilities, types, and plugin system for cli-upkaran",
   "type": "module",
   "main": "dist/cjs/index.cjs",

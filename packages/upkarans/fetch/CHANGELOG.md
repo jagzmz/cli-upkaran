@@ -1,5 +1,15 @@
 # @cli-upkaran/fetch
 
+## 0.0.2-beta.1
+
+### Patch Changes
+
+- 8d7c8d6:
+- Updated dependencies [8d7c8d6]
+  - @cli-upkaran/adapter-website@0.0.2-beta.1
+  - @cli-upkaran/core@0.0.2-beta.1
+  - @cli-upkaran/dataprep-core@0.0.2-beta.1
+
 ## 0.0.2-beta.0
 
 ### Patch Changes

@@ -56,9 +56,6 @@ importers:
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@20.17.30)(typescript@5.8.2)
-      tsx:
-        specifier: ^4.19.3
-        version: 4.19.3
       typescript:
         specifier: ^5.5.3
         version: 5.8.2
@@ -229,25 +226,6 @@ importers:
       '@cli-upkaran/adapter-filesystem':
         specifier: workspace:*
         version: link:../../adapter-filesystem
-      '@cli-upkaran/core':
-        specifier: workspace:*
-        version: link:../../core
-      '@cli-upkaran/dataprep-core':
-        specifier: workspace:*
-        version: link:../../dataprep-core
-      commander:
-        specifier: ^12.0.0
-        version: 12.1.0
-    devDependencies:
-      '@types/node':
-        specifier: ^20.11.20
-        version: 20.17.30
-
-  packages/upkarans/command-fetch:
-    dependencies:
-      '@cli-upkaran/adapter-website':
-        specifier: workspace:*
-        version: link:../../adapter-website
       '@cli-upkaran/core':
         specifier: workspace:*
         version: link:../../core

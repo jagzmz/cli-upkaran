@@ -45,7 +45,7 @@ jobs:
         uses: changesets/action@v1
         with:
           # Optional: Specify publish script if it's not just `pnpm publish`
-          # publish: pnpm run release:publish
+          publish: pnpm run release:publish
           version: pnpm run version:ci # Script to bump versions and update changelogs
           commit: "chore: update versions and changelogs for release" # Commit message for version bumps
           title: "chore: prepare release" # PR title
@@ -55,7 +55,6 @@ jobs:
           # Go to Repo Settings > Secrets and variables > Actions > New repository secret
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      # Optional: Step to check if packages were published
-      # - name: Check Publish Status
-      #   if: steps.changesets.outputs.published == 'true'
-      #   run: echo "Successfully published packages: ${{ steps.changesets.outputs.publishedPackages }}" 
+      - name: Check Publish Status
+        if: steps.changesets.outputs.published == 'true'
+        run: echo "Successfully published packages: ${{ steps.changesets.outputs.publishedPackages }}" 

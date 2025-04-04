@@ -1,0 +1,14 @@
+{
+  "mode": "pre",
+  "tag": "beta",
+  "initialVersions": {
+    "@cli-upkaran/adapter-filesystem": "0.0.1",
+    "@cli-upkaran/adapter-website": "0.0.1",
+    "@cli-upkaran/cli": "0.0.1",
+    "@cli-upkaran/core": "0.0.1",
+    "@cli-upkaran/dataprep-core": "0.0.1",
+    "@cli-upkaran/digest": "0.0.1",
+    "@cli-upkaran/fetch": "0.0.1"
+  },
+  "changesets": []
+}

@@ -56,6 +56,6 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       # Optional: Step to check if packages were published
-      - name: Check Publish Status
-        if: steps.changesets.outputs.published == 'true'
-        run: echo "Successfully published packages: ${{ steps.changesets.outputs.publishedPackages }}"
+      # - name: Check Publish Status
+      #   if: steps.changesets.outputs.published == 'true'
+      #   run: echo "Successfully published packages: ${{ steps.changesets.outputs.publishedPackages }}"

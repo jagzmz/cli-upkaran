@@ -64,3 +64,5 @@ function getChangedPackages(baseRef = 'HEAD~1'): string[] {
   );
   return result;
 }
+
+getChangedPackages();

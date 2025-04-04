@@ -68,6 +68,8 @@ if (!commitSource || commitSource === 'message' || commitSource === 'template' |
     // 8. **** Re-stage the modified file ****
     execSync(`git add "${changesetFilePath}"`);
     console.log(`[prepare-changeset] Re-staged updated file: ${changesetFilePath}`);
+    const status = execSync('git status --short', { encoding: 'utf-8' });
+    console.log('[prepare-changeset] Git status after re-staging:\n', status);
 
   } catch (error) {
     console.error('[prepare-changeset] Error:', error);

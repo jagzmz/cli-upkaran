@@ -85,7 +85,10 @@ async function main() {
         process.exit(1); // Exit if user declines install for requested plugin
       }
 
-      const installSuccess = await installPluginGlobally(requestedPlugin);
+      const installSuccess = await installPluginGlobally(
+        requestedPlugin,
+        requestedPlugin,
+      );
       if (!installSuccess) {
         logger.error(`Failed to install '${requestedPlugin}'. Exiting.`);
         process.exit(1); // Exit if install fails

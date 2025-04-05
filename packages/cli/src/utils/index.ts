@@ -3,6 +3,7 @@ import { exec } from 'node:child_process';
 import util from 'node:util';
 import readline from 'node:readline/promises';
 import { logger } from '@cli-upkaran/core'; // Import logger
+import path from 'node:path';
 
 // Helper require for internal resolution checks
 const require = createRequire(import.meta.url);
@@ -39,7 +40,16 @@ export function checkLocalPlugin(nameOrPath: string): string | null {
     return require.resolve(nameOrPath);
   } catch (e: any) {
     if (e.code === 'MODULE_NOT_FOUND') {
-      return null;
+      // Try relative
+      const relativePath = path.resolve(process.cwd(), nameOrPath);
+      try {
+        return require.resolve(relativePath);
+      } catch (e: any) {
+        if (e.code === 'MODULE_NOT_FOUND') {
+          return null;
+        }
+        throw e;
+      }
     }
     logger.warn(`Unexpected error resolving '${nameOrPath}' locally:`, e);
     return null; // Treat unexpected errors as unresolvable for safety

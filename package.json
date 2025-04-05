@@ -15,7 +15,8 @@
     "clean": "pnpm -r run clean && rm -rf node_modules",
     "prepare": "husky install",
     "version:ci": "changeset version",
-    "release:publish": "node ./.github/scripts/publish-with-tag.js"
+    "release:publish": "node ./.github/scripts/publish-with-tag.js",
+    "cli": "pnpm -r run:cli "
   },
   "keywords": [
     "ai",

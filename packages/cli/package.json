@@ -14,6 +14,7 @@
     "lint": "eslint . --ext .ts",
     "start": "node ./dist/index.js",
     "dev": "tsx src/index.ts",
+    "run:cli": "tsx src/index.ts",
     "test": "echo \"No tests in cli yet\""
   },
   "keywords": [

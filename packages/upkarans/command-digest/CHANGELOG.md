@@ -1,5 +1,14 @@
 # @cli-upkaran/digest
 
+## 0.0.4
+
+### Patch Changes
+
+- Updated dependencies [4c502bb]
+  - @cli-upkaran/core@0.0.4
+  - @cli-upkaran/adapter-filesystem@0.0.4
+  - @cli-upkaran/dataprep-core@0.0.4
+
 ## 0.0.3
 
 ### Patch Changes

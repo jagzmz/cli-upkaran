@@ -68,7 +68,7 @@ export const GettingStartedSection: React.FC = () => {
               </p>
               <div className="flex items-center mb-6">
                 <span className="text-primary mr-2">$</span>
-                <code className="font-mono">npm install -g @cli-upkaran/cli</code>
+                <code className="font-mono">npm install -g cli-upkaran</code>
               </div>
               
               <p className="mb-4 text-sm font-mono text-muted-foreground">

@@ -15,7 +15,7 @@ The `cli-upkaran` toolkit follows a modular architecture designed for extensibil
 
 ```mermaid
 graph TD
-    A["User @ Terminal"] --> B["cli-upkaran CLI (@cli-upkaran/cli)"];
+    A["User @ Terminal"] --> B["cli-upkaran CLI (cli-upkaran)"];
 
     subgraph "Core Infrastructure"
         direction LR
@@ -111,13 +111,13 @@ Install the main CLI package globally using npm (or pnpm):
 
 ```bash
 # Using npm
-npm install -g @cli-upkaran/cli 
+npm install -g cli-upkaran 
 
 # OR Using pnpm
-pnpm add -g @cli-upkaran/cli
+pnpm add -g cli-upkaran
 ```
 
-*(Note: Verify `@cli-upkaran/cli` is the correct published package name if it differs.)*
+*(Note: Verify `cli-upkaran` is the correct published package name if it differs.)*
 
 This will make the `cli-upkaran` command available in your terminal.
 

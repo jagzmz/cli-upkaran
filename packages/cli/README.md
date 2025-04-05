@@ -1,4 +1,4 @@
-# `@cli-upkaran/cli`
+# `cli-upkaran`
 
 [![npm version](https://badge.fury.io/js/%40cli-upkaran%2Fcli.svg)](https://badge.fury.io/js/%40cli-upkaran%2Fcli)
 
@@ -21,9 +21,9 @@ This package provides the main executable (`cli-upkaran`) that users interact wi
 Install this package globally to use the CLI:
 
 ```bash
-npm install -g @cli-upkaran/cli
+npm install -g cli-upkaran
 # or
-pnpm add -g @cli-upkaran/cli
+pnpm add -g cli-upkaran
 ```
 
 ## Usage

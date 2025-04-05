@@ -1,5 +1,5 @@
 {
-  "name": "@cli-upkaran/cli",
+  "name": "cli-upkaran",
   "version": "0.0.2",
   "description": "Main CLI entry point for the cli-upkaran toolkit",
   "bin": {

@@ -1,5 +1,15 @@
 # @cli-upkaran/fetch
 
+## 0.0.3
+
+### Patch Changes
+
+- 2680480: updated @cli-upkaran/cli references from to cli-upkaran
+- Updated dependencies [2680480]
+  - @cli-upkaran/adapter-website@0.0.3
+  - @cli-upkaran/dataprep-core@0.0.3
+  - @cli-upkaran/core@0.0.3
+
 ## 0.0.2
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@cli-upkaran/adapter-website",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Website data preparation adapter for cli-upkaran",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

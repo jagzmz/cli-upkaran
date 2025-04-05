@@ -1,5 +1,13 @@
 # cli-upkaran
 
+## 0.0.4
+
+### Patch Changes
+
+- 4c502bb: Logging updates
+- Updated dependencies [4c502bb]
+  - @cli-upkaran/core@0.0.4
+
 ## 0.0.3
 
 ### Patch Changes

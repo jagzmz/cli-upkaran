@@ -1,5 +1,11 @@
 # cli-upkaran
 
+## 0.0.5
+
+### Patch Changes
+
+- 955ffe6: Better relative path imports
+
 ## 0.0.4
 
 ### Patch Changes

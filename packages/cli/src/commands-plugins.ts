@@ -31,13 +31,14 @@ export function registerPluginCommands(program: Command) {
     .alias('ls')
     .description('List registered plugins')
     .action(async () => {
-      logger.info('Listing registered plugins:');
       try {
         const plugins = getGlobalConfig().plugins;
         if (plugins?.length === 0) {
           logger.info('(No plugins registered)');
         } else {
-          plugins?.forEach((p) => console.log(p)); // Directly print for clean list
+          console.log(
+            `Available Plugins: ${plugins?.map((p) => p.name).join(', ')}`,
+          );
         }
       } catch (error) {
         logger.error('Failed to list plugins:', error);

@@ -155,8 +155,6 @@ export async function loadCommandPlugins(
     }
   }
 
-  logger.info(
-    `Finished processing plugins. Successfully loaded: ${loadedPlugins.length}/${pluginConfigs.length}`,
-  );
+  logger.info(`Loaded: ${loadedPlugins.length}/${pluginConfigs.length}`);
   return loadedPlugins;
 }
